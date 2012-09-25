@@ -4,6 +4,10 @@
 .project
 .pydevproject
 
+# idea
+.idea
+*.iml
+
 # python-builder
 target
 
