@@ -1,0 +1,12 @@
+<!doctype html>
+<html>
+	<head>
+		<title>PyPiProxy Pacakage List</title>
+	</head>
+	<body>
+	<h1>Links for {{ package_name }}</h1>
+	{% for version in versions_list %}
+		<a href="/package/{{ package_name }}/{{ version }}/{{ package_name }}-{{ version }}.tar.gz">{{ package_name }}-{{ version }}.tar.gz</a><br/>
+	{% endfor %}
+	</body>
+</html>

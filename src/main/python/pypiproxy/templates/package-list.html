@@ -1,0 +1,11 @@
+<!doctype html>
+<html>
+	<head>
+		<title>PyPiProxy Pacakage List</title>
+	</head>
+	<body>
+	{% for package_name in package_name_list %}
+		<a href="/simple/{{ package_name }}">{{ package_name }}</a><br/>
+	{% endfor %}
+	</body>
+</html>
