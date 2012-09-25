@@ -26,6 +26,14 @@ class PackageIndex(object):
         return itertools.imap(lambda name_and_version: name_and_version[1],
             itertools.ifilter(lambda name_and_version: name_and_version[0] == package, self._read_packages()))
 
+    def get_package_content(self, package, version):
+        filename = os.path.join(self._directory, package + "-" + version + ".tar.gz")
+        if not os.path.exists(filename):
+            return None
+
+        with open(filename, "rb") as f:
+            return f.read()
+
     def _read_packages(self):
         return itertools.imap(_guess_name_and_version, self._read_files())
 

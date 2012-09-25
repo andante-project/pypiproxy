@@ -33,6 +33,14 @@ class TempDirHandle(object):
     def create_directory(self, *path_elements):
         os.makedirs(self.join(*path_elements))
 
+    def create_file(self, name_parts, content, binary=False):
+        if isinstance(name_parts, basestring):
+            name_parts = [name_parts]
+        open_flags = "w" + "b" if binary else ""
+
+        with open(self.join(*name_parts), open_flags) as f:
+            f.write(content)
+
 
 class TempDirFixture(Fixture):
     def reclaim(self, temp_dir_handle):
@@ -91,7 +99,7 @@ def list_available_package_names_should_return_two_packages_when_directory_conta
     temp_dir.touch("packages", "eggs-0.1.2.tar.gz")
 
     index = PackageIndex("any_name", temp_dir.join("packages"))
-    names = [name for name in index.list_available_package_names()]
+    names = sorted([name for name in index.list_available_package_names()])
 
     assert_that(names).is_equal_to(["eggs", "spam"])
 
@@ -141,14 +149,14 @@ def list_versions_should_return_two_versions_when_two_package_files_match_packag
     temp_dir.touch("packages", "spam-0.1.3.tar.gz")
 
     index = PackageIndex("any_name", temp_dir.join("packages"))
-    versions = [v for v in index.list_versions("spam")]
+    versions = sorted([v for v in index.list_versions("spam")])
 
-    assert_that(versions).is_equal_to(["0.1.3", "0.1.2"])
+    assert_that(versions).is_equal_to(["0.1.2", "0.1.3"])
 
 
 @test
 @given(temp_dir=TempDirFixture)
-def list_versions_should_ignore_package_files_when_name_does_not_match_wanted_name_(temp_dir):
+def list_versions_should_ignore_package_files_when_name_does_not_match_wanted_name(temp_dir):
     temp_dir.create_directory("packages")
     temp_dir.touch("packages", "eggs-0.1.2.tar.gz")
     temp_dir.touch("packages", "eggs-0.1.3.tar.gz")
@@ -157,3 +165,30 @@ def list_versions_should_ignore_package_files_when_name_does_not_match_wanted_na
     versions = [v for v in index.list_versions("spam")]
 
     assert_that(versions).is_empty()
+
+
+@test
+@given(temp_dir=TempDirFixture)
+def get_package_content_should_return_file_content_when_file_exists(temp_dir):
+    content = "spam and eggs"
+    temp_dir.create_directory("packages")
+    temp_dir.create_file(["packages", "eggs-0.1.2.tar.gz"], content, binary=True)
+
+    index = PackageIndex("any_name", temp_dir.join("packages"))
+
+    actual_content = index.get_package_content("eggs", "0.1.2")
+
+    assert_that(actual_content).is_equal_to(content)
+
+
+@test
+@given(temp_dir=TempDirFixture)
+def get_package_content_should_return_none_when_file_does_not_exist(temp_dir):
+    content = "spam and eggs"
+    temp_dir.create_directory("packages")
+
+    index = PackageIndex("any_name", temp_dir.join("packages"))
+
+    actual_content = index.get_package_content("eggs", "0.1.2")
+
+    assert_that(actual_content).is_none()

@@ -22,4 +22,4 @@ def get_package_content(name, version):
     """
         @return: a file-like object
     """
-    pass
+    return _hosted_packages_index.get_package_content(name, version)
