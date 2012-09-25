@@ -1,5 +1,12 @@
 *.py[co]
 
+# eclipse
+.project
+.pydevproject
+
+# python-builder
+target
+
 # Packages
 *.egg
 *.egg-info
@@ -25,3 +32,6 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+# virtual environment
+ve
