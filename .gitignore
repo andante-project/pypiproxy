@@ -39,6 +39,7 @@ pip-log.txt
 
 # virtual environment
 ve
+test-ve
 
 # pypiproxy directory for packages (will be created when executed runserver.py)
 packages

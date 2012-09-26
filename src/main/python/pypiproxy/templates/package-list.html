@@ -1,11 +1,10 @@
-<!doctype html>
-<html>
-	<head>
-		<title>PyPiProxy Pacakage List</title>
-	</head>
-	<body>
-	{% for package_name in package_name_list %}
-		<a href="/simple/{{ package_name }}">{{ package_name }}</a><br/>
-	{% endfor %}
-	</body>
-</html>
+{% extends "template.html" %}
+
+{% block title %}Package List{% endblock %}
+
+{% block content %}
+  <h1>List of Packages</h1>
+  {% for package_name in package_name_list %}
+  <a href="/simple/{{ package_name }}">{{ package_name }}</a><br/>
+  {% endfor %}
+{% endblock %}

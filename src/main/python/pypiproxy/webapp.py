@@ -15,9 +15,11 @@
 
 __author__ = "Michael Gruber, Alexander Metzner"
 
-from flask import Flask, render_template, abort
+import StringIO
 
-from .services import list_available_package_names, list_versions, get_package_content
+from flask import Flask, request, render_template, abort
+
+from .services import list_available_package_names, list_versions, get_package_content, upload_package
 
 application = Flask(__name__)
 
@@ -45,3 +47,27 @@ def handle_package_list():
     return render_template("package-list.html",
                            package_name_list=list_available_package_names())
 
+
+@application.route("/", methods=["POST"])
+def handle_upload_package ():
+    # TODO: What about authentication
+    action = request.form[":action"]
+    name = request.form["name"]
+    version = request.form["version"]
+
+    if action != "file_upload":
+        print "Invalid action '{0}'".format(action)
+        abort(400)
+
+    if not name or not version:
+        print "Missing name or version"
+        abort(400)
+
+    # TODO: Validate content type
+
+    content = request.files["content"]
+    buffer = StringIO.StringIO()
+    content.save(buffer)
+
+    upload_package(name, version, buffer.getvalue())
+    return ""

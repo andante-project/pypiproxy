@@ -23,3 +23,7 @@ def get_package_content(name, version):
         @return: a file-like object
     """
     return _hosted_packages_index.get_package_content(name, version)
+
+
+def upload_package(name, version, content_stream):
+    _hosted_packages_index.add_package(name, version, content_stream)

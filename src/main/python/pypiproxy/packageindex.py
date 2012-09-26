@@ -12,12 +12,19 @@ def _guess_name_and_version(filename):
 
 
 class PackageIndex(object):
+    FILE_SUFFIX = ".tar.gz"
+
     def __init__(self, name, directory):
         self._name = name
         self._directory = directory
 
         if not os.path.exists(directory):
             os.makedirs(directory)
+
+    def add_package(self, name, version, content_stream):
+        filename = os.path.join(self._directory, "{0}-{1}{2}".format(name, version, PackageIndex.FILE_SUFFIX))
+        with open(filename, "wb") as package_file:
+            package_file.write(content_stream)
 
     def list_available_package_names(self):
         return UniqueIterator(itertools.imap(lambda name_and_version: name_and_version[0], self._read_packages()))
@@ -27,7 +34,7 @@ class PackageIndex(object):
             itertools.ifilter(lambda name_and_version: name_and_version[0] == package, self._read_packages()))
 
     def get_package_content(self, package, version):
-        filename = os.path.join(self._directory, package + "-" + version + ".tar.gz")
+        filename = os.path.join(self._directory, package + "-" + version + PackageIndex.FILE_SUFFIX)
         if not os.path.exists(filename):
             return None
 
@@ -38,7 +45,7 @@ class PackageIndex(object):
         return itertools.imap(_guess_name_and_version, self._read_files())
 
     def _read_files(self):
-        return itertools.ifilter(lambda f: f.endswith("tar.gz"), os.listdir(self._directory))
+        return itertools.ifilter(lambda f: f.endswith(PackageIndex.FILE_SUFFIX), os.listdir(self._directory))
 
 
 class UniqueIterator(object):
