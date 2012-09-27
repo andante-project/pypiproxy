@@ -67,10 +67,6 @@ def handle_upload_package ():
         print "Invalid action '{0}'".format(action)
         abort(400)
 
-    if not name or not version:
-        print "Missing name or version"
-        abort(400)
-
     # TODO: Validate content type
 
     content = request.files["content"]

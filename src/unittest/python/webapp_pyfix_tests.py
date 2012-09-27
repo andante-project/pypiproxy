@@ -15,6 +15,8 @@
 
 __author__ = "Michael Gruber, Alexander Metzner"
 
+import StringIO
+
 from pyfix import test, run_tests, after, Fixture, given
 from pyassert import assert_that
 from mockito import when, verify, never, any as any_value, unstub
@@ -106,6 +108,61 @@ def should_send_not_found_when_trying_to_get_package_content_for_nonexisting_pac
     assert_that(response.status_code).is_equal_to(404)
 
     verify(webapp).get_package_content("package_name", "version")
+
+
+@test
+@given(web_application=FlaskWebAppFixture)
+@after(unstub)
+def should_send_bad_request_when_trying_to_upload_package_when_action_is_missing(web_application):
+    response = web_application.post("/")
+    assert_that(response.status_code).is_equal_to(400)
+
+
+@test
+@given(web_application=FlaskWebAppFixture)
+@after(unstub)
+def should_send_bad_request_when_trying_to_upload_package_when_name_is_missing(web_application):
+    response = web_application.post("/", data={":action": "spam"})
+    assert_that(response.status_code).is_equal_to(400)
+
+
+@test
+@given(web_application=FlaskWebAppFixture)
+@after(unstub)
+def should_send_bad_request_when_trying_to_upload_package_when_version_is_missing(web_application):
+    response = web_application.post("/", data={":action": "spam", "name": "spam"})
+    assert_that(response.status_code).is_equal_to(400)
+
+
+@test
+@given(web_application=FlaskWebAppFixture)
+@after(unstub)
+def should_send_bad_request_when_trying_to_upload_package_with_wrong_action(web_application):
+    response = web_application.post("/", data={":action": "spam", "name": "name", "version": "version"})
+    assert_that(response.status_code).is_equal_to(400)
+
+
+@test
+@given(web_application=FlaskWebAppFixture)
+@after(unstub)
+def should_send_bad_request_when_trying_to_upload_package_and_content_is_missing(web_application):
+    response = web_application.post("/", data={":action": "file_upload", "name": "name", "version": "version"})
+    assert_that(response.status_code).is_equal_to(400)
+
+
+@test
+@given(web_application=FlaskWebAppFixture)
+@after(unstub)
+def should_send_ok_and_delegate_to_services_when_uploading_file(web_application):
+    when(webapp).upload_package(any_value(), any_value(), any_value()).thenReturn(None)
+
+    response = web_application.post("/",
+        data={":action": "file_upload", "name": "name", "version": "version",
+              "content": (StringIO.StringIO("content"), "name-version.tar.gz")})
+
+    assert_that(response.status_code).is_equal_to(200)
+
+    verify(webapp).upload_package("name", "version", "content")
 
 
 if __name__ == "__main__":
