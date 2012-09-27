@@ -17,7 +17,7 @@ __author__ = "Michael Gruber, Alexander Metzner"
 
 import StringIO
 
-from flask import Flask, request, render_template, abort
+from flask import Flask, request, render_template, abort, make_response
 
 from .services import list_available_package_names, list_versions, get_package_content, upload_package
 
@@ -26,14 +26,21 @@ application = Flask(__name__)
 
 @application.route("/package/<package_name>/<version>/<file_name>")
 def handle_package_content(package_name, version, file_name):
-    return get_package_content(package_name, version)
+    content = get_package_content(package_name, version)
+    if content is None:
+        abort(404)
+
+    response = make_response(content)
+    response.headers["Content-Disposition"] = "attachment; filename={0}".format(file_name)
+    response.headers["Content-Type"] = "application/x-gzip"
+    return response
 
 
 @application.route("/simple/<package_name>")
 @application.route("/simple/<package_name>/")
 def handle_version_list(package_name):
     version_list = [v for v in list_versions(package_name)]
-    
+
     if not len(version_list):
         return "", 404
     
@@ -43,6 +50,7 @@ def handle_version_list(package_name):
 
 
 @application.route("/simple")
+@application.route("/simple/")
 def handle_package_list():
     return render_template("package-list.html",
                            package_name_list=list_available_package_names())

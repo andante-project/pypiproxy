@@ -15,64 +15,95 @@
 
 __author__ = "Michael Gruber, Alexander Metzner"
 
-from pyfix import test, run_tests, after
+from pyfix import test, run_tests, after, Fixture, given
 from pyassert import assert_that
 from mockito import when, verify, never, any as any_value, unstub
 
 from pypiproxy import webapp
 
+
+class FlaskWebAppFixture(Fixture):
+    def provide(self):
+        webapp.application.config["TESTING"] = True
+        return [webapp.application.test_client()]
+
+
 @test
+@given(web_application=FlaskWebAppFixture)
 @after(unstub)
-def should_return_list_of_available_package_versions():
+def should_return_list_of_available_package_versions(web_application):
     when(webapp).list_versions(any_value()).thenReturn(["0.1.2", "0.1.3"])
     when(webapp).render_template(any_value(), package_name=any_value(), versions_list=any_value()).thenReturn(
         "rendered template")
 
-    actual_result = webapp.handle_version_list("committer")
+    response = web_application.get("/simple/committer/")
 
-    assert_that(actual_result).is_equal_to("rendered template")
+    assert_that(response.status_code).is_equal_to(200)
+    assert_that(response.data).is_equal_to("rendered template")
 
     verify(webapp).list_versions("committer")
     verify(webapp).render_template("version-list.html", package_name="committer", versions_list=["0.1.2", "0.1.3"])
 
 
 @test
+@given(web_application=FlaskWebAppFixture)
 @after(unstub)
-def should_return_error_when_no_versions_available():
+def should_return_error_when_no_versions_available(web_application):
     when(webapp).list_versions(any_value()).thenReturn([])
     when(webapp).render_template(any_value(), package_name=any_value(), versions_list=any_value()).thenReturn(
         "rendered template")
 
-    actual_result = webapp.handle_version_list("committer")
+    response = web_application.get("/simple/committer/")
 
-    assert_that(actual_result).is_equal_to(("", 404))
+    assert_that(response.status_code).is_equal_to(404)
 
     verify(webapp).list_versions("committer")
     verify(webapp, never).render_template("version-list.html", package_name=any_value(), versions_list=any_value())
 
 
 @test
+@given(web_application=FlaskWebAppFixture)
 @after(unstub)
-def should_return_list_of_available_packages():
+def should_return_list_of_available_packages(web_application):
     when(webapp).list_available_package_names().thenReturn(["abc", "def", "ghi"])
     when(webapp).render_template(any_value(), package_name_list=any_value()).thenReturn("rendered template")
 
-    actual_result = webapp.handle_package_list()
+    response = web_application.get("/simple/")
 
-    assert_that(actual_result).is_equal_to("rendered template")
+    assert_that(response.status_code).is_equal_to(200)
+    assert_that(response.data).is_equal_to("rendered template")
 
     verify(webapp).list_available_package_names()
     verify(webapp).render_template("package-list.html", package_name_list=["abc", "def", "ghi"])
 
 
 @test
+@given(web_application=FlaskWebAppFixture)
 @after(unstub)
-def should_return_package_content():
+def should_return_package_content(web_application):
     when(webapp).get_package_content(any_value(), any_value()).thenReturn("package content")
 
-    actual_content = webapp.handle_package_content("package_name", "version", "package_name-version.tar.gz")
+    response = web_application.get("/package/package_name/version/package_name-version.tar.gz")
 
-    assert_that(actual_content).is_equal_to("package content")
+    assert_that(response.status_code).is_equal_to(200)
+    assert_that(response.data).is_equal_to("package content")
+    assert_that(response.headers.get("Content-Disposition", None)).is_equal_to(
+        "attachment; filename=package_name-version.tar.gz")
+    assert_that(response.headers.get("Content-Type", None)).is_equal_to(
+        "application/x-gzip")
+
+    verify(webapp).get_package_content("package_name", "version")
+
+
+@test
+@given(web_application=FlaskWebAppFixture)
+@after(unstub)
+def should_send_not_found_when_trying_to_get_package_content_for_nonexisting_package(web_application):
+    when(webapp).get_package_content(any_value(), any_value()).thenReturn(None)
+
+    response = web_application.get("/package/package_name/version/package_name-version.tar.gz")
+
+    assert_that(response.status_code).is_equal_to(404)
 
     verify(webapp).get_package_content("package_name", "version")
 

@@ -1,7 +1,23 @@
+#   pypiproxy
+#   Copyright 2012 Michael Gruber, Alexander Metzner
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 __author__ = "Alexander Metzner"
 
 import os
 import shutil
+import StringIO
 import tempfile
 
 from pyfix import test, given, Fixture
@@ -48,6 +64,13 @@ class TempDirFixture(Fixture):
 
     def provide(self):
         return [TempDirHandle()]
+
+
+class PackageData(Fixture):
+    def provide(self):
+        buffer = StringIO.StringIO()
+        buffer.write("some package data")
+        return [buffer.getvalue()]
 
 
 @test
@@ -192,3 +215,14 @@ def get_package_content_should_return_none_when_file_does_not_exist(temp_dir):
     actual_content = index.get_package_content("eggs", "0.1.2")
 
     assert_that(actual_content).is_none()
+
+
+@test
+@given(temp_dir=TempDirFixture, package_data=PackageData)
+def add_package_should_write_package_file(temp_dir, package_data):
+    index = PackageIndex("any_name", temp_dir.join("packages"))
+    index.add_package("spam", "version", package_data)
+
+    expected_file_name = temp_dir.join("packages", "spam-version.tar.gz")
+    assert_that(expected_file_name).is_a_file()
+    assert_that(expected_file_name).has_file_length_of(17)
