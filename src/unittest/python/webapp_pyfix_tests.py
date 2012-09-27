@@ -26,7 +26,7 @@ from pypiproxy import webapp
 
 class FlaskWebAppFixture(Fixture):
     def provide(self):
-        webapp.application.config["TESTING"] = True
+        webapp.application.testing = True
         return [webapp.application.test_client()]
 
 
