@@ -23,7 +23,16 @@ _PACKAGE_NAME_AND_VERSION_PATTERN = re.compile(r"^(.*?)(-([0-9.]+.*)).tar.gz$")
 
 def _guess_name_and_version(filename):
     result = _PACKAGE_NAME_AND_VERSION_PATTERN.match(filename)
-    return result.group(1), result.group(3)
+    if result:
+        return result.group(1), result.group(3)
+
+    filename = filename.replace(r".tar.gz", "")
+
+    if "-" in filename:
+        split_index = filename.rfind("-")
+        return filename[0:split_index], filename[split_index + 1:]
+
+    raise ValueError("Invalid egg archive file name: '{0}'".format(filename))
 
 
 class PackageIndex(object):
@@ -43,6 +52,9 @@ class PackageIndex(object):
 
     def list_available_package_names(self):
         return UniqueIterator(itertools.imap(lambda name_and_version: name_and_version[0], self._read_packages()))
+
+    def count_packages(self):
+        return len([p for p in self._read_packages()])
 
     def list_versions(self, package):
         return itertools.imap(lambda name_and_version: name_and_version[1],

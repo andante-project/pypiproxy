@@ -19,6 +19,16 @@ from .packageindex import PackageIndex
 
 _hosted_packages_index = PackageIndex("hosted", "packages/hosted")
 
+def get_package_statistics():
+    """
+    Returns a tuple containing several statistics of the index:
+    # of package files, # of unique package names
+    """
+    package_names = _hosted_packages_index.list_available_package_names()
+    number_of_unique_packages = len([p for p in package_names]) if package_names else 0
+    return _hosted_packages_index.count_packages(), number_of_unique_packages
+
+
 def list_available_package_names():
     """
         @return: iterable of strings

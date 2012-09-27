@@ -1,0 +1,49 @@
+{% extends "template.html" %}
+
+{% block title %}Index{% endblock %}
+{% block head %}
+{{ super() }}
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/css/bootstrap-combined.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="span8 hero-unit">
+      <h1>PyPi Proxy</h1>
+
+      <p>
+        PyPi Proxy is PyPI compatible combination of hosted repository and proxy for another pypi service (i.e.
+        <a href="//pypi.python.org">pypi.python.org</a>).
+      </p>
+
+      <h2>Serving</h2>
+      <ul>
+        <li><strong>{{ number_of_packages }}</strong> package(s) in total</li>
+        <li><strong>{{ number_of_unique_packages }}</strong> unique package(s)</li>
+      </ul>
+    </div>
+
+    <div class="span2">
+      <ul class="nav nav-list">
+        <li class="nav-header">Usefull Links</li>
+        <li><a href="/simple">List of Packages</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block footer %}
+<hr>
+<div class="container">
+  <div class="offset1 span5">
+    {{ super() }}
+  </div>
+</div>
+
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min.js"></script>
+{% endblock %}
+
+

@@ -2,16 +2,17 @@
 <html>
 <head>
   {% block head %}
-  <link rel="stylesheet" href="style.css" />
   <title>{% block title %}{% endblock %} - pypiproxy</title>
   {% endblock %}
 </head>
 <body>
 
-<div id="content">{% block content %}{% endblock %}</div>
+{% block content %}{% endblock %}
+
 <footer>
   {% block footer %}
-  &copy; Copyright 2012 by A. Metzner (M. Gruber hat nur daneben gesessen).
+  PyPi Proxy Version {{ version }} <br>
+  &copy; Copyright 2012 Michael Gruber &amp; Alexander Metzner
   {% endblock %}
 </footer>
 </body>

@@ -15,6 +15,7 @@
 
 __author__ = "Alexander Metzner"
 
+import sys
 import os
 
 from pyassert import Matcher, register_matcher
@@ -60,3 +61,23 @@ class FileLengthMatcher(Matcher):
 
     def _get_file_size(self, filename):
         return os.stat(filename).st_size
+
+
+@register_matcher("raises")
+class RaisesMatcher(Matcher):
+    def __init__(self, expected_exception_type):
+        self._expected_exception_type = expected_exception_type
+        self._actual_exception_type = None
+
+    def matches(self, actual):
+        try:
+            actual()
+        except:
+            self._actual_exception_type = sys.exc_info()[0]
+        return self._actual_exception_type == self._expected_exception_type
+
+    def describe(self, actual):
+        return "Expected '{0}' to raise exception of type {1} but instead caught {2}".format(actual,
+            self._expected_exception_type, self._actual_exception_type)
+
+

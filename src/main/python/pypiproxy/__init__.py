@@ -15,4 +15,4 @@
 
 __author__ = "Michael Gruber, Alexander Metzner"
 
-__version__ = "0.1.1"
+__version__ = "${version}"

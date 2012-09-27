@@ -23,7 +23,7 @@ import tempfile
 from pyfix import test, given, Fixture
 from pyassert import assert_that
 
-import filesystem_matchers
+import matchers
 
 from pypiproxy.packageindex import PackageIndex, _guess_name_and_version
 
@@ -91,6 +91,19 @@ def guess_name_and_version_should_understand_simple_version_with_suffix():
 @test
 def guess_name_and_version_should_understand_dashed_package_name_with_simple_version_with_suffix():
     assert_that(_guess_name_and_version("spam-and-eggs-1.2-rc1.tar.gz")).is_equal_to(("spam-and-eggs", "1.2-rc1"))
+
+
+@test
+def guess_name_and_version_should_understand_version_without_numbers_and_dots():
+    assert_that(_guess_name_and_version("spam-and-eggs.tar.gz")).is_equal_to(("spam-and", "eggs"))
+
+
+@test
+def guess_name_and_version_should_understand_file_name_without_dash():
+    def callback():
+        _guess_name_and_version("spam.tar.gz")
+
+    assert_that(callback).raises(ValueError)
 
 
 @test
@@ -226,3 +239,22 @@ def add_package_should_write_package_file(temp_dir, package_data):
     expected_file_name = temp_dir.join("packages", "spam-version.tar.gz")
     assert_that(expected_file_name).is_a_file()
     assert_that(expected_file_name).has_file_length_of(17)
+
+
+@test
+@given(temp_dir=TempDirFixture)
+def count_packages_should_return_zero_when_directory_is_empty(temp_dir):
+    assert_that(PackageIndex("any_name", temp_dir.join("packages")).count_packages()).is_equal_to(0)
+
+
+@test
+@given(temp_dir=TempDirFixture)
+def count_packages_should_return_one_when_directory_is_empty(temp_dir):
+    temp_dir.create_directory("packages")
+    temp_dir.touch("packages", "spam-eggs.tar.gz")
+    assert_that(PackageIndex("any_name", temp_dir.join("packages")).count_packages()).is_equal_to(1)
+
+if __name__ == "__main__":
+    from pyfix import run_tests
+
+    run_tests()

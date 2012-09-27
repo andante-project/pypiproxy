@@ -19,9 +19,22 @@ import StringIO
 
 from flask import Flask, request, render_template, abort, make_response
 
-from .services import list_available_package_names, list_versions, get_package_content, upload_package
+from pypiproxy import __version__ as version
+from .services import (list_available_package_names, list_versions, get_package_content, upload_package,
+                       get_package_statistics)
 
 application = Flask(__name__)
+
+
+def render_application_template(template_name, **template_parameters):
+    template_parameters["version"] = version
+    return render_template(template_name, **template_parameters)
+
+
+@application.route("/")
+def handle_index():
+    number_of_packages, number_of_unique_packages = get_package_statistics()
+    return render_application_template("index.html", **locals())
 
 
 @application.route("/package/<package_name>/<version>/<file_name>")
@@ -43,28 +56,27 @@ def handle_version_list(package_name):
 
     if not len(version_list):
         return "", 404
-    
-    return render_template("version-list.html", 
-                           package_name=package_name,
-                           versions_list=version_list)
+
+    return render_application_template("version-list.html",
+        package_name=package_name,
+        versions_list=version_list)
 
 
 @application.route("/simple")
 @application.route("/simple/")
 def handle_package_list():
-    return render_template("package-list.html",
-                           package_name_list=list_available_package_names())
+    return render_application_template("package-list.html",
+        package_name_list=list_available_package_names())
 
 
 @application.route("/", methods=["POST"])
-def handle_upload_package ():
+def handle_upload_package():
     # TODO: What about authentication
     action = request.form[":action"]
     name = request.form["name"]
     version = request.form["version"]
 
     if action != "file_upload":
-        print "Invalid action '{0}'".format(action)
         abort(400)
 
     # TODO: Validate content type

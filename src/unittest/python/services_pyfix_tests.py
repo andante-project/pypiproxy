@@ -16,7 +16,8 @@
 __author__ = "Alexander Metzner"
 
 from pyfix import test, after
-from mockito import mock, verify, unstub
+from pyassert import assert_that
+from mockito import mock, verify, unstub, when
 
 import pypiproxy.services
 
@@ -58,3 +59,17 @@ def ensure_that_upload_package_delegates_to_hosted_packages_index():
     pypiproxy.services.upload_package("spam", "0.1.1", "any_buffer")
 
     verify(pypiproxy.services._hosted_packages_index).add_package("spam", "0.1.1", "any_buffer")
+
+
+@test
+@after(unstub)
+def ensure_that_get_package_statistics_delegates_to_hosted_packages_index():
+    pypiproxy.services._hosted_packages_index = mock()
+    when(pypiproxy.services._hosted_packages_index).count_packages().thenReturn(0)
+
+    actual = pypiproxy.services.get_package_statistics()
+
+    assert_that(actual).is_equal_to((0, 0))
+
+    verify(pypiproxy.services._hosted_packages_index).list_available_package_names()
+    verify(pypiproxy.services._hosted_packages_index).count_packages()
