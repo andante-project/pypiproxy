@@ -44,10 +44,8 @@ license = "Apache License, Version 2.0"
 
 @init
 def init (project):
-    project.build_depends_on("coverage")
     project.build_depends_on("mockito")
     project.build_depends_on("pyassert")
-    project.build_depends_on("pyfix")
 
     project.depends_on("flask")
 
