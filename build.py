@@ -53,8 +53,10 @@ def init (project):
 
     project.get_property("filter_resources_glob").append("**/pypiproxy/__init__.py")
 
+    project.include_file("pypiproxy", "templates/*.html")
+
     project.set_property("pychecker_break_build", False)
-    
+
     project.set_property("coverage_threshold_warn", 85)
     project.set_property("coverage_break_build", False)
 
