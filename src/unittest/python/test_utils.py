@@ -15,9 +15,12 @@
 
 __author__ = "Alexander Metzner"
 
-import sys
 import os
+import shutil
+import sys
+import tempfile
 
+from pyfix import Fixture
 from pyassert import Matcher, register_matcher
 
 @register_matcher("is_a_directory")
@@ -81,3 +84,40 @@ class RaisesMatcher(Matcher):
             self._expected_exception_type, self._actual_exception_type)
 
 
+class TempDirHandle(object):
+    def __init__(self):
+        self.basedir = tempfile.mkdtemp(prefix=__name__)
+
+    def __del__(self):
+        if os.path.exists(self.basedir):
+            shutil.rmtree(self.basedir)
+
+    def join(self, *path_elements):
+        path_elements = [self.basedir] + list(path_elements)
+        return os.path.join(*path_elements)
+
+    def touch(self, *path_elements):
+        f = open(self.join(*path_elements), "w")
+        try:
+            f.write("")
+        finally:
+            f.close()
+
+    def create_directory(self, *path_elements):
+        os.makedirs(self.join(*path_elements))
+
+    def create_file(self, name_parts, content, binary=False):
+        if isinstance(name_parts, basestring):
+            name_parts = [name_parts]
+        open_flags = "w" + ("b" if binary else "")
+
+        with open(self.join(*name_parts), open_flags) as f:
+            f.write(content)
+
+
+class TempDirFixture(Fixture):
+    def reclaim(self, temp_dir_handle):
+        del temp_dir_handle
+
+    def provide(self):
+        return [TempDirHandle()]

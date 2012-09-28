@@ -53,10 +53,10 @@ def ensure_that_get_package_content_delegates_to_hosted_packages_index():
 
 @test
 @after(unstub)
-def ensure_that_upload_package_delegates_to_hosted_packages_index():
+def ensure_that_add_package_delegates_to_hosted_packages_index():
     pypiproxy.services._hosted_packages_index = mock()
 
-    pypiproxy.services.upload_package("spam", "0.1.1", "any_buffer")
+    pypiproxy.services.add_package("spam", "0.1.1", "any_buffer")
 
     verify(pypiproxy.services._hosted_packages_index).add_package("spam", "0.1.1", "any_buffer")
 

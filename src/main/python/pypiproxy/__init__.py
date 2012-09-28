@@ -16,3 +16,35 @@
 __author__ = "Michael Gruber, Alexander Metzner"
 
 __version__ = "${version}"
+
+import logging
+
+from .configuration import Configuration
+from .services import initialize_services
+
+def initialize(config_file):
+    configuration = Configuration(config_file)
+    initialize_logging(configuration.log_file)
+    initialize_services(configuration.packages_directory)
+
+
+def initialize_logging(log_file):
+    formatter = logging.Formatter("%(asctime)s [%(name)s] %(levelname)s: %(message)s'")
+
+    log_file_handler = logging.FileHandler(log_file)
+    log_file_handler.setLevel(logging.DEBUG)
+    log_file_handler.setFormatter(formatter)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    console_handler.setFormatter(formatter)
+
+    pypiproxy_logger = logging.getLogger("pypiproxy")
+    pypiproxy_logger.setLevel(logging.DEBUG)
+    pypiproxy_logger.addHandler(log_file_handler)
+    pypiproxy_logger.addHandler(console_handler)
+
+    werkzeug_logger = logging.getLogger("werkzeug")
+    werkzeug_logger.setLevel(logging.INFO)
+    werkzeug_logger.addHandler(log_file_handler)
+    werkzeug_logger.addHandler(console_handler)

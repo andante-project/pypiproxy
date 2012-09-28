@@ -143,7 +143,7 @@ def should_send_bad_request_when_trying_to_upload_package_and_content_is_missing
 @given(web_application=FlaskWebAppFixture)
 @after(unstub)
 def should_send_ok_and_delegate_to_services_when_uploading_file(web_application):
-    when(webapp).upload_package(any_value(), any_value(), any_value()).thenReturn(None)
+    when(webapp).add_package(any_value(), any_value(), any_value()).thenReturn(None)
 
     response = web_application.post("/",
         data={":action": "file_upload", "name": "name", "version": "version",
@@ -151,7 +151,7 @@ def should_send_ok_and_delegate_to_services_when_uploading_file(web_application)
 
     assert_that(response.status_code).is_equal_to(200)
 
-    verify(webapp).upload_package("name", "version", "content")
+    verify(webapp).add_package("name", "version", "content")
 
 
 @test

@@ -15,16 +15,19 @@
 
 __author__ = "Michael Gruber, Alexander Metzner"
 
+import logging
 import StringIO
 
 from flask import Flask, request, render_template, abort, make_response
 
 from pypiproxy import __version__ as version
-from .services import (list_available_package_names, list_versions, get_package_content, upload_package,
+from .services import (list_available_package_names, list_versions, get_package_content, add_package,
                        get_package_statistics)
 
-application = Flask(__name__)
 
+LOGGER = logging.getLogger("pypiproxy.webapp")
+
+application = Flask(__name__)
 
 def render_application_template(template_name, **template_parameters):
     template_parameters["version"] = version
@@ -33,12 +36,16 @@ def render_application_template(template_name, **template_parameters):
 
 @application.route("/")
 def handle_index():
+    LOGGER.debug("Handling request for index")
+
     number_of_packages, number_of_unique_packages = get_package_statistics()
     return render_application_template("index.html", **locals())
 
 
 @application.route("/package/<package_name>/<version>/<file_name>")
 def handle_package_content(package_name, version, file_name):
+    LOGGER.debug("Handling request to download package %s", file_name)
+
     content = get_package_content(package_name, version)
     if content is None:
         abort(404)
@@ -52,6 +59,8 @@ def handle_package_content(package_name, version, file_name):
 @application.route("/simple/<package_name>")
 @application.route("/simple/<package_name>/")
 def handle_version_list(package_name):
+    LOGGER.debug("Handling request to list versions for '%s'", package_name)
+
     version_list = [v for v in list_versions(package_name)]
 
     if not len(version_list):
@@ -65,12 +74,16 @@ def handle_version_list(package_name):
 @application.route("/simple")
 @application.route("/simple/")
 def handle_package_list():
+    LOGGER.debug("Handling request to list all packages")
+
     return render_application_template("package-list.html",
         package_name_list=list_available_package_names())
 
 
 @application.route("/", methods=["POST"])
 def handle_upload_package():
+    LOGGER.debug("Handling request to upload package")
+
     # TODO: What about authentication
     action = request.form[":action"]
     name = request.form["name"]
@@ -85,5 +98,5 @@ def handle_upload_package():
     buffer = StringIO.StringIO()
     content.save(buffer)
 
-    upload_package(name, version, buffer.getvalue())
+    add_package(name, version, buffer.getvalue())
     return ""

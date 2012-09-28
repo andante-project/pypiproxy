@@ -16,8 +16,11 @@
 __author__ = "Alexander Metzner"
 
 import itertools
+import logging
 import os
 import re
+
+LOGGER = logging.getLogger("pypiproxy.packageindex")
 
 _PACKAGE_NAME_AND_VERSION_PATTERN = re.compile(r"^(.*?)(-([0-9.]+.*)).tar.gz$")
 
@@ -39,6 +42,7 @@ class PackageIndex(object):
     FILE_SUFFIX = ".tar.gz"
 
     def __init__(self, name, directory):
+        LOGGER.info("Creating packageindex '%s' serving directory '%s'", name, directory)
         self._name = name
         self._directory = directory
 
@@ -47,6 +51,9 @@ class PackageIndex(object):
 
     def add_package(self, name, version, content_stream):
         filename = os.path.join(self._directory, "{0}-{1}{2}".format(name, version, PackageIndex.FILE_SUFFIX))
+
+        LOGGER.info("Adding package '%s %s' to file '%s'", name, version, filename)
+
         with open(filename, "wb") as package_file:
             package_file.write(content_stream)
 
