@@ -58,7 +58,9 @@ class PackageIndex(object):
             package_file.write(content_stream)
 
     def list_available_package_names(self):
-        return UniqueIterator(itertools.imap(lambda name_and_version: name_and_version[0], self._read_packages()))
+        package_names = [p for p in itertools.imap(lambda name_and_version: name_and_version[0], self._read_packages())]
+        package_names = sorted(package_names)
+        return UniqueIterator(package_names.__iter__())
 
     def count_packages(self):
         return len([p for p in self._read_packages()])
