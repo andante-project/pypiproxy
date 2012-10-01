@@ -18,9 +18,9 @@ __author__ = "Alexander Metzner"
 import StringIO
 
 from pyfix import test, given, Fixture
+from pyfix.fixtures import TemporaryDirectoryFixture
 from pyassert import assert_that
 
-from test_utils import TempDirFixture
 
 from pypiproxy.packageindex import PackageIndex, _guess_name_and_version
 
@@ -66,7 +66,7 @@ def guess_name_and_version_should_understand_file_name_without_dash():
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def ensure_that_constructor_creates_directory_if_it_does_not_exist(temp_dir):
     package_dir = temp_dir.join("packages")
     PackageIndex("any_name", package_dir)
@@ -75,7 +75,7 @@ def ensure_that_constructor_creates_directory_if_it_does_not_exist(temp_dir):
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def list_available_package_names_should_return_single_package_when_directory_contains_single_package_file(temp_dir):
     temp_dir.create_directory("packages")
     temp_dir.touch("packages", "spam-0.1.2.tar.gz")
@@ -87,7 +87,7 @@ def list_available_package_names_should_return_single_package_when_directory_con
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def list_available_package_names_should_return_two_packages_when_directory_contains_two_package_files(temp_dir):
     temp_dir.create_directory("packages")
     temp_dir.touch("packages", "spam-0.1.2.tar.gz")
@@ -100,7 +100,7 @@ def list_available_package_names_should_return_two_packages_when_directory_conta
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def list_available_package_names_should_return_single_package_when_directory_contains_two_package_files_for_the_same_package_name(
         temp_dir):
     temp_dir.create_directory("packages")
@@ -114,7 +114,7 @@ def list_available_package_names_should_return_single_package_when_directory_con
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def list_versions_should_return_empty_list_when_no_package_files_are_found(temp_dir):
     temp_dir.create_directory("packages")
 
@@ -125,7 +125,7 @@ def list_versions_should_return_empty_list_when_no_package_files_are_found(temp_
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def list_versions_should_return_single_version_when_single_package_file_matches_package_name(temp_dir):
     temp_dir.create_directory("packages")
     temp_dir.touch("packages", "spam-0.1.2.tar.gz")
@@ -137,7 +137,7 @@ def list_versions_should_return_single_version_when_single_package_file_matches_
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def list_versions_should_return_two_versions_when_two_package_files_match_package_name(temp_dir):
     temp_dir.create_directory("packages")
     temp_dir.touch("packages", "spam-0.1.2.tar.gz")
@@ -150,7 +150,7 @@ def list_versions_should_return_two_versions_when_two_package_files_match_packag
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def list_versions_should_ignore_package_files_when_name_does_not_match_wanted_name(temp_dir):
     temp_dir.create_directory("packages")
     temp_dir.touch("packages", "eggs-0.1.2.tar.gz")
@@ -163,7 +163,7 @@ def list_versions_should_ignore_package_files_when_name_does_not_match_wanted_na
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def get_package_content_should_return_file_content_when_file_exists(temp_dir):
     content = "spam and eggs"
     temp_dir.create_directory("packages")
@@ -177,7 +177,7 @@ def get_package_content_should_return_file_content_when_file_exists(temp_dir):
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def get_package_content_should_return_none_when_file_does_not_exist(temp_dir):
     content = "spam and eggs"
     temp_dir.create_directory("packages")
@@ -190,7 +190,7 @@ def get_package_content_should_return_none_when_file_does_not_exist(temp_dir):
 
 
 @test
-@given(temp_dir=TempDirFixture, package_data=PackageData)
+@given(temp_dir=TemporaryDirectoryFixture, package_data=PackageData)
 def add_package_should_write_package_file(temp_dir, package_data):
     index = PackageIndex("any_name", temp_dir.join("packages"))
     index.add_package("spam", "version", package_data)
@@ -201,13 +201,13 @@ def add_package_should_write_package_file(temp_dir, package_data):
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def count_packages_should_return_zero_when_directory_is_empty(temp_dir):
     assert_that(PackageIndex("any_name", temp_dir.join("packages")).count_packages()).is_equal_to(0)
 
 
 @test
-@given(temp_dir=TempDirFixture)
+@given(temp_dir=TemporaryDirectoryFixture)
 def count_packages_should_return_one_when_directory_is_empty(temp_dir):
     temp_dir.create_directory("packages")
     temp_dir.touch("packages", "spam-eggs.tar.gz")
