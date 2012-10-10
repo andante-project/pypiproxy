@@ -49,13 +49,21 @@ class PackageIndex(object):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
+    def _filename_from_name_and_version(self, name, version):
+        return os.path.join(self._directory, "{0}-{1}{2}".format(name, version, PackageIndex.FILE_SUFFIX))
+
     def add_package(self, name, version, content_stream):
-        filename = os.path.join(self._directory, "{0}-{1}{2}".format(name, version, PackageIndex.FILE_SUFFIX))
+        filename = self._filename_from_name_and_version(name, version)
 
         LOGGER.info("Adding package '%s %s' to file '%s'", name, version, filename)
 
         with open(filename, "wb") as package_file:
             package_file.write(content_stream)
+
+    def contains(self, name, version):
+        filename = self._filename_from_name_and_version(name, version)
+
+        return os.path.exists(filename)
 
     def list_available_package_names(self):
         package_names = [p for p in itertools.imap(lambda name_and_version: name_and_version[0], self._read_packages())]

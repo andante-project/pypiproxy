@@ -213,6 +213,23 @@ def count_packages_should_return_one_when_directory_is_empty(temp_dir):
     temp_dir.touch("packages", "spam-eggs.tar.gz")
     assert_that(PackageIndex("any_name", temp_dir.join("packages")).count_packages()).is_equal_to(1)
 
+
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+def contains_should_return_false_if_package_not_available(temp_dir):
+    temp_dir.create_directory("packages")
+    package_index = PackageIndex("any_name", temp_dir.join("packages"))
+    assert_that(package_index.contains("egg", "0.1.2")).is_equal_to(False)
+
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+def contains_should_return_true_if_package_available(temp_dir):
+    temp_dir.create_directory("packages")
+    temp_dir.touch("packages", "spam-0.1.2.tar.gz")
+    package_index = PackageIndex("any_name", temp_dir.join("packages"))
+    assert_that(package_index.contains("spam", "0.1.2")).is_equal_to(True)
+
+
 if __name__ == "__main__":
     from pyfix import run_tests
 
