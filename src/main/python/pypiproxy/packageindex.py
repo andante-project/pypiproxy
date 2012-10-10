@@ -79,7 +79,7 @@ class PackageIndex(object):
 
     def get_package_content(self, package, version):
         filename = os.path.join(self._directory, package + "-" + version + PackageIndex.FILE_SUFFIX)
-        if not os.path.exists(filename):
+        if not self.contains(package, version):
             return None
 
         with open(filename, "rb") as f:

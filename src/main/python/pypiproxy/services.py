@@ -60,6 +60,11 @@ def get_package_content(name, version):
         @return: a file-like object
     """
     LOGGER.debug("Retrieving package content for '%s %s'", name, version)
+
+    if not _hosted_packages_index.contains(name, version):
+        LOGGER.error("Package {0} of version {1} not hosted.".format(name, version))
+        return None
+
     return _hosted_packages_index.get_package_content(name, version)
 
 

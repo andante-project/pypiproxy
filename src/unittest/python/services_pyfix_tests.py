@@ -17,7 +17,7 @@ __author__ = "Alexander Metzner"
 
 from pyfix import test, after
 from pyassert import assert_that
-from mockito import mock, verify, unstub, when
+from mockito import mock, verify, unstub, when, any
 
 import pypiproxy.services
 
@@ -45,10 +45,22 @@ def ensure_that_list_versions_delegates_to_hosted_packages_index():
 @after(unstub)
 def ensure_that_get_package_content_delegates_to_hosted_packages_index():
     pypiproxy.services._hosted_packages_index = mock()
+    when(pypiproxy.services._hosted_packages_index).contains(any(), any()).thenReturn(True)
 
     pypiproxy.services.get_package_content("spam", "0.1.1")
 
     verify(pypiproxy.services._hosted_packages_index).get_package_content("spam", "0.1.1")
+
+
+@test
+@after(unstub)
+def ensure_that_get_package_content_checks_if_package_is_available():
+    pypiproxy.services._hosted_packages_index = mock()
+    when(pypiproxy.services._hosted_packages_index).contains(any(), any()).thenReturn(True)
+
+    pypiproxy.services.get_package_content("spam", "0.1.1")
+
+    verify(pypiproxy.services._hosted_packages_index).contains("spam", "0.1.1")
 
 
 @test
