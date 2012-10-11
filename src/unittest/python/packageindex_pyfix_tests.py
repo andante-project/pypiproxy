@@ -63,7 +63,7 @@ def guess_name_and_version_should_understand_file_name_without_dash():
         _guess_name_and_version("spam.tar.gz")
 
     assert_that(callback).raises(ValueError)
-
+    
 
 @test
 @given(temp_dir=TemporaryDirectoryFixture)

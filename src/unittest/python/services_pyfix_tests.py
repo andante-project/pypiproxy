@@ -54,13 +54,25 @@ def ensure_that_get_package_content_delegates_to_hosted_packages_index():
 
 @test
 @after(unstub)
-def ensure_that_get_package_content_checks_if_package_is_available():
+def ensure_that_get_package_content_checks_if_package_is_hosted():
     pypiproxy.services._hosted_packages_index = mock()
     when(pypiproxy.services._hosted_packages_index).contains(any(), any()).thenReturn(True)
 
     pypiproxy.services.get_package_content("spam", "0.1.1")
 
     verify(pypiproxy.services._hosted_packages_index).contains("spam", "0.1.1")
+
+
+@test
+@after(unstub)
+def ensure_that_get_package_content_uses_proxy_if_package_not_hosted():
+    pypiproxy.services._hosted_packages_index = mock()
+    pypiproxy.services._proxy_packages_index = mock()
+    when(pypiproxy.services._hosted_packages_index).contains(any(), any()).thenReturn(False)
+
+    pypiproxy.services.get_package_content("spam", "0.1.1")
+
+    verify(pypiproxy.services._proxy_packages_index).get_package_content("spam", "0.1.1")
 
 
 @test

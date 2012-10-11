@@ -15,7 +15,7 @@
 
 __author__ = "Alexander Metzner"
 
-from pyfix import test, given, Fixture
+from pyfix import test, given
 from pyfix.fixtures import TemporaryDirectoryFixture
 from pyassert import assert_that
 
@@ -69,6 +69,25 @@ def should_return_given_log_file_when_log_file_option_is_given(temp_dir):
 
     config = Configuration(temp_dir.join("config.cfg"))
     assert_that(config.log_file).is_equal_to("spam.log")
+
+
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+def should_return_default_pypi_url_when_no_pypi_url_option_is_given(temp_dir):
+    temp_dir.create_file("config.cfg", "[{0}]".format(Configuration.SECTION))
+
+    config = Configuration(temp_dir.join("config.cfg"))
+    assert_that(config.pypi_url).is_equal_to(Configuration.DEFAULT_PYPI_URL)
+
+
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+def should_return_given_pypi_url_when_pypi_url_option_is_given(temp_dir):
+    temp_dir.create_file("config.cfg",
+        "[{0}]\n{1}=spam.log".format(Configuration.SECTION, Configuration.OPTION_PYPI_URL))
+
+    config = Configuration(temp_dir.join("config.cfg"))
+    assert_that(config.pypi_url).is_equal_to("spam.log")
 
 
 @test

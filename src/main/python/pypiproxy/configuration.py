@@ -21,21 +21,16 @@ class Configuration(object):
     SECTION = "pypiproxy"
     OPTION_LOG_FILE = "log_file"
     OPTION_PACKAGES_DIRECTORY = "packages_directory"
+    OPTION_PYPI_URL = "pypi_url"
 
     DEFAULT_LOG_FILE = "/var/log/pypiproxy.log"
+    DEFAULT_PYPI_URL = "http://pypi.python.org"
 
     def __init__(self, config_file_name):
         self._config_parser = ConfigParser.RawConfigParser()
         self._load_config_file(config_file_name)
 
         self._verify_config()
-
-    def _get_option(self, option, default_value=None):
-        if not self._config_parser.has_option(Configuration.SECTION, option):
-            if default_value:
-                return default_value
-            raise ValueError("Missing configuration option '%s' in section '%s'", option, Configuration.SECTION)
-        return self._config_parser.get(Configuration.SECTION, option)
 
     @property
     def log_file(self):
@@ -44,6 +39,17 @@ class Configuration(object):
     @property
     def packages_directory(self):
         return self._get_option(Configuration.OPTION_PACKAGES_DIRECTORY)
+
+    @property
+    def pypi_url(self):
+        return self._get_option(Configuration.OPTION_PYPI_URL, Configuration.DEFAULT_PYPI_URL)
+
+    def _get_option(self, option, default_value=None):
+        if not self._config_parser.has_option(Configuration.SECTION, option):
+            if default_value:
+                return default_value
+            raise ValueError("Missing configuration option '%s' in section '%s'", option, Configuration.SECTION)
+        return self._config_parser.get(Configuration.SECTION, option)
 
     def _load_config_file(self, config_file_name):
         try:

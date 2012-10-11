@@ -25,7 +25,7 @@ from .services import initialize_services
 def initialize(config_file):
     configuration = Configuration(config_file)
     initialize_logging(configuration.log_file)
-    initialize_services(configuration.packages_directory)
+    initialize_services(configuration.packages_directory, configuration.pypi_url)
 
 
 def initialize_logging(log_file):

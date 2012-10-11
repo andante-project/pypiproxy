@@ -14,7 +14,7 @@
 #   limitations under the License.
 
 """
-	Simple PyPI implementation.
+	A proxy server for the python package index.
 """
 
 __author__ = 'Michael Gruber, Alexander Metzner'
@@ -35,8 +35,8 @@ use_plugin("python.install_dependencies")
 
 default_task = ["analyze", "publish"]
 
-version = "0.1.2"
-summary = "A framework for writing automated software tests (non xUnit based)"
+version = "0.2.0"
+summary = "A proxy server for the python package index."
 authors = (Author("Alexander Metzner", "halimath.wilanthaou@gmail.com"),
 		   Author("Michael Gruber", "aelgru@gmail.com"))
 url     = "https://github.com/aelgru/pypiproxy"
