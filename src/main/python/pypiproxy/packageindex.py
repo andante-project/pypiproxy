@@ -19,6 +19,7 @@ import itertools
 import logging
 import os
 import re
+import urllib2
 
 LOGGER = logging.getLogger("pypiproxy.packageindex")
 
@@ -48,6 +49,10 @@ class PackageIndex(object):
 
         if not os.path.exists(directory):
             os.makedirs(directory)
+
+    @property
+    def directory(self):
+        return self._directory
 
     def add_package(self, name, version, content_stream):
         filename = self._filename_from_name_and_version(name, version)
@@ -93,11 +98,24 @@ class PackageIndex(object):
 
 
 class ProxyPackageIndex(object):
+    """
+    Retrieves the packages from another pypi and stores them in a package index. 
+    """
     def __init__(self, name, directory, pypi_url):
         self._package_index = PackageIndex(name, directory)
+        self._pypi_url = pypi_url
 
     def get_package_content(self, name, version):
-        pass
+        if not self._package_index.contains(name, version):
+            filename = "{0}-{1}{2}".format(name, version, PackageIndex.FILE_SUFFIX)
+            package_url = "{0}/packages/source/{1}/{2}/{3}".format(self._pypi_url, name[0], name, filename)
+            package_stream = urllib2.urlopen(package_url)
+
+            self._package_index.add_package(name, version, package_stream)
+
+        return self._package_index.get_package_content(name, version)
+
+
 
 class UniqueIterator(object):
     """
