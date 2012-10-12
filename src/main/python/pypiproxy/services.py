@@ -61,11 +61,17 @@ def list_available_package_names():
         @return: iterable of strings
     """
     LOGGER.debug("Listing available packages")
-    return _hosted_packages_index.list_available_package_names()
+    cached_packages = _proxy_packages_index.list_available_package_names()
+    hosted_packages = _hosted_packages_index.list_available_package_names()
+    
+    return sorted(cached_packages + hosted_packages)
 
 def list_versions(name):
     """
         @return: iterable of strings
     """
     LOGGER.debug("Listing versions for package '%s'", name)
-    return _hosted_packages_index.list_versions(name)
+    if _hosted_packages_index.contains(name):
+        return _hosted_packages_index.list_versions(name)
+    
+    _proxy_packages_index.list_versions(name)

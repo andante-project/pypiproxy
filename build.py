@@ -35,7 +35,7 @@ use_plugin("python.install_dependencies")
 
 default_task = ["analyze", "publish"]
 
-version = "0.2.1"
+version = "0.2.2"
 summary = "A proxy server for the python package index."
 authors = (Author("Alexander Metzner", "halimath.wilanthaou@gmail.com"),
 		   Author("Michael Gruber", "aelgru@gmail.com"))

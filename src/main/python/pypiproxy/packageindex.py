@@ -43,12 +43,12 @@ class PackageIndex(object):
     FILE_SUFFIX = ".tar.gz"
 
     def __init__(self, name, directory):
-        LOGGER.info("Creating packageindex '%s' serving directory '%s'", name, directory)
         self._name = name
         self._directory = directory
+        LOGGER.info("Creating packageindex '%s' serving directory '%s'", name, self._directory)
 
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        if not os.path.exists(self._directory):
+            os.makedirs(self._directory)
 
     @property
     def directory(self):
@@ -115,6 +115,8 @@ class ProxyPackageIndex(object):
 
         return self._package_index.get_package_content(name, version)
 
+    def list_available_package_names(self):
+        raise NotImplementedError()
 
 
 class UniqueIterator(object):

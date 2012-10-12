@@ -27,9 +27,9 @@ from pypiproxy.packageindex import PackageIndex, _guess_name_and_version
 
 class PackageData(Fixture):
     def provide(self):
-        buffer = StringIO.StringIO()
-        buffer.write("some package data")
-        return [buffer.getvalue()]
+        data_buffer = StringIO.StringIO()
+        data_buffer.write("some package data")
+        return [data_buffer.getvalue()]
 
 
 @test
@@ -179,7 +179,6 @@ def get_package_content_should_return_file_content_when_file_exists(temp_dir):
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
 def get_package_content_should_return_none_when_file_does_not_exist(temp_dir):
-    content = "spam and eggs"
     temp_dir.create_directory("packages")
 
     index = PackageIndex("any_name", temp_dir.join("packages"))
@@ -203,7 +202,9 @@ def add_package_should_write_package_file(temp_dir, package_data):
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
 def count_packages_should_return_zero_when_directory_is_empty(temp_dir):
-    assert_that(PackageIndex("any_name", temp_dir.join("packages")).count_packages()).is_equal_to(0)
+    index = PackageIndex("any_name", temp_dir.join("packages"))
+
+    assert_that(index.count_packages()).is_equal_to(0)
 
 
 @test
@@ -211,23 +212,27 @@ def count_packages_should_return_zero_when_directory_is_empty(temp_dir):
 def count_packages_should_return_one_when_directory_is_empty(temp_dir):
     temp_dir.create_directory("packages")
     temp_dir.touch("packages", "spam-eggs.tar.gz")
-    assert_that(PackageIndex("any_name", temp_dir.join("packages")).count_packages()).is_equal_to(1)
+    index = PackageIndex("any_name", temp_dir.join("packages"))
+    
+    assert_that(index.count_packages()).is_equal_to(1)
 
 
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
 def contains_should_return_false_if_package_not_available(temp_dir):
     temp_dir.create_directory("packages")
-    package_index = PackageIndex("any_name", temp_dir.join("packages"))
-    assert_that(package_index.contains("egg", "0.1.2")).is_equal_to(False)
+    index = PackageIndex("any_name", temp_dir.join("packages"))
+    
+    assert_that(index.contains("egg", "0.1.2")).is_equal_to(False)
 
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
 def contains_should_return_true_if_package_available(temp_dir):
     temp_dir.create_directory("packages")
     temp_dir.touch("packages", "spam-0.1.2.tar.gz")
-    package_index = PackageIndex("any_name", temp_dir.join("packages"))
-    assert_that(package_index.contains("spam", "0.1.2")).is_equal_to(True)
+    index = PackageIndex("any_name", temp_dir.join("packages"))
+    
+    assert_that(index.contains("spam", "0.1.2")).is_equal_to(True)
 
 
 if __name__ == "__main__":

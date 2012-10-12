@@ -17,38 +17,63 @@ __author__ = "Alexander Metzner"
 
 from pyfix import test, after
 from pyassert import assert_that
-from mockito import mock, verify, unstub, when, any
+from mockito import mock, verify, unstub, when, any as any_value
 
 import pypiproxy.services
 
 @test
 @after(unstub)
-def ensure_that_list_available_package_names_delegates_to_hosted_packages_index():
+def ensure_that_list_available_package_names_delegates_to_hosted_packages_index_and_proxy():
     pypiproxy.services._hosted_packages_index = mock()
+    when(pypiproxy.services._hosted_packages_index).list_available_package_names().thenReturn(["spam", "eggs"])
+    
+    pypiproxy.services._proxy_packages_index = mock()
+    when(pypiproxy.services._proxy_packages_index).list_available_package_names().thenReturn(["ham", "salt", "pepper"])
 
-    pypiproxy.services.list_available_package_names()
+    actual_list = pypiproxy.services.list_available_package_names()
+
+    assert_that(actual_list).is_equal_to(["eggs", "ham", "pepper", "salt", "spam"])
 
     verify(pypiproxy.services._hosted_packages_index).list_available_package_names()
+    verify(pypiproxy.services._proxy_packages_index).list_available_package_names()
 
 
 @test
 @after(unstub)
-def ensure_that_list_versions_delegates_to_hosted_packages_index():
+def ensure_that_list_versions_delegates_to_hosted_packages_index_when_package_is_hosted():
     pypiproxy.services._hosted_packages_index = mock()
+    when(pypiproxy.services._hosted_packages_index).contains("spam").thenReturn(True)
 
     pypiproxy.services.list_versions("spam")
 
+    verify(pypiproxy.services._hosted_packages_index).contains("spam")
     verify(pypiproxy.services._hosted_packages_index).list_versions("spam")
+
+
+@test
+@after(unstub)
+def ensure_that_list_versions_delegates_to_hosted_packages_index_when_package_not_hosted():
+    pypiproxy.services._proxy_packages_index = mock()
+    pypiproxy.services._hosted_packages_index = mock()
+    when(pypiproxy.services._hosted_packages_index).contains("spam").thenReturn(False)
+
+    pypiproxy.services.list_versions("spam")
+
+    verify(pypiproxy.services._hosted_packages_index).contains("spam")
+    verify(pypiproxy.services._proxy_packages_index).list_versions("spam")
 
 
 @test
 @after(unstub)
 def ensure_that_get_package_content_delegates_to_hosted_packages_index():
     pypiproxy.services._hosted_packages_index = mock()
-    when(pypiproxy.services._hosted_packages_index).contains(any(), any()).thenReturn(True)
+    package_content = mock()
+    when(pypiproxy.services._hosted_packages_index).get_package_content(any_value(), any_value()).thenReturn(package_content)
+    when(pypiproxy.services._hosted_packages_index).contains(any_value(), any_value()).thenReturn(True)
 
-    pypiproxy.services.get_package_content("spam", "0.1.1")
+    actual_content = pypiproxy.services.get_package_content("spam", "0.1.1")
 
+    assert_that(actual_content).is_equal_to(package_content)
     verify(pypiproxy.services._hosted_packages_index).get_package_content("spam", "0.1.1")
 
 
@@ -56,7 +81,7 @@ def ensure_that_get_package_content_delegates_to_hosted_packages_index():
 @after(unstub)
 def ensure_that_get_package_content_checks_if_package_is_hosted():
     pypiproxy.services._hosted_packages_index = mock()
-    when(pypiproxy.services._hosted_packages_index).contains(any(), any()).thenReturn(True)
+    when(pypiproxy.services._hosted_packages_index).contains(any_value(), any_value()).thenReturn(True)
 
     pypiproxy.services.get_package_content("spam", "0.1.1")
 
@@ -68,10 +93,13 @@ def ensure_that_get_package_content_checks_if_package_is_hosted():
 def ensure_that_get_package_content_uses_proxy_if_package_not_hosted():
     pypiproxy.services._hosted_packages_index = mock()
     pypiproxy.services._proxy_packages_index = mock()
-    when(pypiproxy.services._hosted_packages_index).contains(any(), any()).thenReturn(False)
+    package_content = mock()
+    when(pypiproxy.services._proxy_packages_index).get_package_content(any_value(), any_value()).thenReturn(package_content)
+    when(pypiproxy.services._hosted_packages_index).contains(any_value(), any_value()).thenReturn(False)
 
-    pypiproxy.services.get_package_content("spam", "0.1.1")
+    actual_content = pypiproxy.services.get_package_content("spam", "0.1.1")
 
+    assert_that(actual_content).is_equal_to(package_content)
     verify(pypiproxy.services._proxy_packages_index).get_package_content("spam", "0.1.1")
 
 

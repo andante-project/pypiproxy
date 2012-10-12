@@ -26,6 +26,7 @@ import pypiproxy.packageindex
 
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
+@after(unstub)
 def ensure_proxy_checks_if_package_is_already_cached (temp_dir):
     temp_dir.create_directory("packages")
     proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")
@@ -38,6 +39,7 @@ def ensure_proxy_checks_if_package_is_already_cached (temp_dir):
 
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
+@after(unstub)
 def ensure_proxy_gets_package_content_from_package_index_if_it_is_already_cached (temp_dir):
     temp_dir.create_directory("packages")
     proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")

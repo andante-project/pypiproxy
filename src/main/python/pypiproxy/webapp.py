@@ -76,8 +76,7 @@ def handle_version_list(package_name):
 def handle_package_list():
     LOGGER.debug("Handling request to list all packages")
 
-    return render_application_template("package-list.html",
-        package_name_list=list_available_package_names())
+    return render_application_template("package-list.html", package_name_list=list_available_package_names())
 
 
 @application.route("/", methods=["POST"])
