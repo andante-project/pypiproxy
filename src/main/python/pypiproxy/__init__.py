@@ -29,7 +29,7 @@ def initialize(config_file):
 
 
 def initialize_logging(log_file):
-    formatter = logging.Formatter("%(asctime)s [%(name)s] %(levelname)s: %(message)s'")
+    formatter = logging.Formatter("%(asctime)s [%(name)s] %(levelname)s: %(message)s")
 
     log_file_handler = logging.FileHandler(log_file)
     log_file_handler.setLevel(logging.DEBUG)

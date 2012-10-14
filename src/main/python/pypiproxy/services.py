@@ -16,6 +16,7 @@
 __author__ = "Michael Gruber, Alexander Metzner"
 
 import logging
+import os
 
 from .packageindex import PackageIndex, ProxyPackageIndex
 
@@ -26,10 +27,10 @@ _proxy_packages_index = None
 
 def initialize_services(packages_directory, pypi_url):
     global _hosted_packages_index
-    _hosted_packages_index = PackageIndex("hosted", packages_directory)
-    
+    _hosted_packages_index = PackageIndex("hosted", os.path.join(packages_directory, "hosted"))
+
     global _proxy_packages_index
-    _proxy_packages_index = ProxyPackageIndex("cached", packages_directory, pypi_url)
+    _proxy_packages_index = ProxyPackageIndex("cached", os.path.join(packages_directory, "cached"), pypi_url)
 
 def add_package(name, version, content_stream):
     LOGGER.debug("Adding package '%s %s'", name, version)
@@ -42,8 +43,10 @@ def get_package_content(name, version):
     LOGGER.debug("Retrieving package content for '%s %s'", name, version)
 
     if _hosted_packages_index.contains(name, version):
+        LOGGER.debug("Package {0} is hosted.".format(name))
         return _hosted_packages_index.get_package_content(name, version)
 
+    LOGGER.debug("Package {0} is not hosted.".format(name))
     return _proxy_packages_index.get_package_content(name, version)
 
 def get_package_statistics():
@@ -63,7 +66,7 @@ def list_available_package_names():
     LOGGER.debug("Listing available packages")
     cached_packages = _proxy_packages_index.list_available_package_names()
     hosted_packages = _hosted_packages_index.list_available_package_names()
-    
+
     return sorted(cached_packages + hosted_packages)
 
 def list_versions(name):
@@ -71,7 +74,10 @@ def list_versions(name):
         @return: iterable of strings
     """
     LOGGER.debug("Listing versions for package '%s'", name)
+
     if _hosted_packages_index.contains(name):
+        LOGGER.debug("Package '{0}' is not hosted.".format(name))
         return _hosted_packages_index.list_versions(name)
-    
-    _proxy_packages_index.list_versions(name)
+
+    LOGGER.debug("Listing cached versions for package '{0}'.".format(name))
+    return _proxy_packages_index.list_versions(name)

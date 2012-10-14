@@ -94,8 +94,8 @@ def handle_upload_package():
     # TODO: Validate content type
 
     content = request.files["content"]
-    buffer = StringIO.StringIO()
-    content.save(buffer)
+    content_buffer = StringIO.StringIO()
+    content.save(content_buffer)
 
-    add_package(name, version, buffer.getvalue())
+    add_package(name, version, content_buffer.getvalue())
     return ""

@@ -13,10 +13,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-__author__ = "Alexander Metzner"
+__author__ = "Alexander Metzner, Michael Gruber"
 
 import itertools
 import logging
+import glob
 import os
 import re
 import urllib2
@@ -36,7 +37,7 @@ def _guess_name_and_version(filename):
         split_index = filename.rfind("-")
         return filename[0:split_index], filename[split_index + 1:]
 
-    raise ValueError("Invalid egg archive file name: '{0}'".format(filename))
+    raise ValueError("Invalid package file name: '{0}'".format(filename))
 
 
 class PackageIndex(object):
@@ -62,10 +63,10 @@ class PackageIndex(object):
         with open(filename, "wb") as package_file:
             package_file.write(content_stream)
 
-    def contains(self, name, version):
+    def contains(self, name, version="*"):
         filename = self._filename_from_name_and_version(name, version)
-
-        return os.path.exists(filename)
+        list_of_files = glob.glob(filename)
+        return len(list_of_files) > 0
 
     def count_packages(self):
         return len([p for p in self._read_packages()])
@@ -83,9 +84,18 @@ class PackageIndex(object):
         package_names = sorted(package_names)
         return UniqueIterator(package_names.__iter__())
 
-    def list_versions(self, package):
-        return itertools.imap(lambda name_and_version: name_and_version[1],
-            itertools.ifilter(lambda name_and_version: name_and_version[0] == package, self._read_packages()))
+    def list_versions(self, name):
+        LOGGER.info("Listing versions for '{0}'".format(name))
+
+        packages_iterator = self._read_packages()
+        result = [v[1] for v in (packages_iterator) if v[0] == name]
+        LOGGER.info("result = {0}".format(result))
+
+        return result
+
+
+        #return itertools.imap(lambda name_and_version: name_and_version[1],
+        #    itertools.ifilter(lambda name_and_version: name_and_version[0] == name, packages_iterator))
 
     def _filename_from_name_and_version(self, name, version):
         return os.path.join(self._directory, "{0}-{1}{2}".format(name, version, PackageIndex.FILE_SUFFIX))
@@ -117,6 +127,9 @@ class ProxyPackageIndex(object):
 
     def list_available_package_names(self):
         raise NotImplementedError()
+
+    def list_versions(self, name):
+        return self._package_index.list_versions(name)
 
 
 class UniqueIterator(object):

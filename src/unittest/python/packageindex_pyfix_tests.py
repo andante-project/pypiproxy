@@ -63,7 +63,7 @@ def guess_name_and_version_should_understand_file_name_without_dash():
         _guess_name_and_version("spam.tar.gz")
 
     assert_that(callback).raises(ValueError)
-    
+
 
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
@@ -213,7 +213,7 @@ def count_packages_should_return_one_when_directory_is_empty(temp_dir):
     temp_dir.create_directory("packages")
     temp_dir.touch("packages", "spam-eggs.tar.gz")
     index = PackageIndex("any_name", temp_dir.join("packages"))
-    
+
     assert_that(index.count_packages()).is_equal_to(1)
 
 
@@ -222,16 +222,26 @@ def count_packages_should_return_one_when_directory_is_empty(temp_dir):
 def contains_should_return_false_if_package_not_available(temp_dir):
     temp_dir.create_directory("packages")
     index = PackageIndex("any_name", temp_dir.join("packages"))
-    
+
     assert_that(index.contains("egg", "0.1.2")).is_equal_to(False)
+
 
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
 def contains_should_return_true_if_package_available(temp_dir):
     temp_dir.create_directory("packages")
+    temp_dir.touch("packages", "spam-0.1.5.tar.gz")
+    index = PackageIndex("any_name", temp_dir.join("packages"))
+
+    assert_that(index.contains("spam")).is_equal_to(True)
+
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+def contains_should_return_true_if_package_in_specific_version_available(temp_dir):
+    temp_dir.create_directory("packages")
     temp_dir.touch("packages", "spam-0.1.2.tar.gz")
     index = PackageIndex("any_name", temp_dir.join("packages"))
-    
+
     assert_that(index.contains("spam", "0.1.2")).is_equal_to(True)
 
 
