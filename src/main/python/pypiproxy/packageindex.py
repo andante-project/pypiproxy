@@ -87,15 +87,8 @@ class PackageIndex(object):
     def list_versions(self, name):
         LOGGER.info("Listing versions for '{0}'".format(name))
 
-        packages_iterator = self._read_packages()
-        result = [v[1] for v in (packages_iterator) if v[0] == name]
-        LOGGER.info("result = {0}".format(result))
-
-        return result
-
-
-        #return itertools.imap(lambda name_and_version: name_and_version[1],
-        #    itertools.ifilter(lambda name_and_version: name_and_version[0] == name, packages_iterator))
+        return itertools.imap(lambda name_and_version: name_and_version[1],
+            itertools.ifilter(lambda name_and_version: name_and_version[0] == name, self._read_packages()))
 
     def _filename_from_name_and_version(self, name, version):
         return os.path.join(self._directory, "{0}-{1}{2}".format(name, version, PackageIndex.FILE_SUFFIX))
