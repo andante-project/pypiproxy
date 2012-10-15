@@ -13,14 +13,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-__author__ = "Michael Gruber"
+__author__ = "Michael Gruber, Maximilien Riehl"
 
 from pyfix import after, test, given
 from pyfix.fixtures import TemporaryDirectoryFixture
 from pyassert import assert_that
 from mockito import when, mock, unstub, verify, any as any_value
 from StringIO import StringIO
-
+from urllib2 import URLError
 
 from pypiproxy.packageindex import ProxyPackageIndex
 import pypiproxy.packageindex
@@ -93,6 +93,19 @@ def ensure_list_available_package_names_retrieves_index_from_pypi (temp_dir):
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
 @after(unstub)
+def ensure_list_available_package_names_delegates_to_cached_index_when_failing_to_download_index (temp_dir):
+    proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")
+    temp_dir.touch("packages", "spam-0.1.2.tar.gz")
+    temp_dir.touch("packages", "eggs-0.1.2.tar.gz")
+    when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenRaise(URLError("Failed!"))
+
+    actual_list = proxy_package_index.list_available_package_names()
+
+    assert_that(actual_list).is_equal_to(['eggs', 'spam'])
+
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+@after(unstub)
 def ensure_list_versions_retrieves_versions_from_pypi (temp_dir):
     proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")
     package_stream = StringIO("""<!doctype html><html><body>
@@ -108,6 +121,24 @@ def ensure_list_versions_retrieves_versions_from_pypi (temp_dir):
 
     assert_that(actual_list).is_equal_to(['0.1.2', '1.2.3', '2.3.4'])
     verify(pypiproxy.packageindex.urllib2).urlopen("http://pypi.python.org/simple/package/")
+
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+@after(unstub)
+def ensure_list_versions_delegates_to_cached_versions_when_to_download_versions_from_pypi (temp_dir):
+    proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")
+    temp_dir.touch("packages", "spam-0.1.2.tar.gz")
+    temp_dir.touch("packages", "spam-2.3.4.tar.gz")
+    temp_dir.touch("packages", "spam-2.3.4.egg")
+    temp_dir.touch("packages", "spam-1.2.3.tar.gz")
+    temp_dir.touch("packages", "eggs-0.1.2.tar.gz")
+    temp_dir.touch("packages", "eggs-0.1.2.egg")
+    when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenRaise(URLError("Failed!"))
+
+    actual_list = proxy_package_index.list_versions("spam")
+
+    assert_that(actual_list).is_equal_to(['0.1.2', '1.2.3', '2.3.4'])
+    verify(pypiproxy.packageindex.urllib2).urlopen("http://pypi.python.org/simple/spam/")
 
 if __name__ == "__main__":
     from pyfix import run_tests

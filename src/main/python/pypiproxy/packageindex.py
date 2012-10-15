@@ -13,7 +13,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-__author__ = "Alexander Metzner, Michael Gruber"
+__author__ = "Alexander Metzner, Michael Gruber, Maximilien Riehl"
 
 import itertools
 import logging
@@ -120,35 +120,40 @@ class ProxyPackageIndex(object):
         return self._package_index.get_package_content(name, version)
 
     def list_available_package_names(self):
-        index_url = "{0}/simple/".format(self._pypi_url)
-        LOGGER.info("Downloading index from {0}".format(index_url))
-        index_stream = urllib2.urlopen(index_url)
+        try:
+            index_url = "{0}/simple/".format(self._pypi_url)
+            LOGGER.info("Downloading index from {0}".format(index_url))
+            index_stream = urllib2.urlopen(index_url)
 
-        result = []
-        for line in index_stream:
-            line = line.decode("utf8")
-            if line.startswith('<a href'):
-                name = line[line.find('>') + 1:line.rfind('</a><br/>')]
-                result.append(name)
+            result = []
+            for line in index_stream:
+                line = line.decode("utf8")
+                if line.startswith('<a href'):
+                    name = line[line.find('>') + 1:line.rfind('</a><br/>')]
+                    result.append(name)
 
-        index_stream.close()
-
-        return result
+            index_stream.close()
+            return result
+        except urllib2.URLError:
+            return sorted(list(self._package_index.list_available_package_names()))
 
     def list_versions(self, name):
-        versions_url = "{0}/simple/{1}/".format(self._pypi_url, name)
-        LOGGER.info("Downloading versions from {0}".format(versions_url))
-        versions_stream = urllib2.urlopen(versions_url)
+        try:
+            versions_url = "{0}/simple/{1}/".format(self._pypi_url, name)
+            LOGGER.info("Downloading versions from {0}".format(versions_url))
+            versions_stream = urllib2.urlopen(versions_url)
 
-        result = []
-        for line in versions_stream:
-            line = line.decode("utf8")
-            if line.startswith('<a href') and line.find(PackageIndex.FILE_SUFFIX) >= 0:
-                name = line[line.find('>') + 1:line.rfind('</a><br/>')]
-                version = _guess_name_and_version(name)[1]
-                result.append(version)
+            result = []
+            for line in versions_stream:
+                line = line.decode("utf8")
+                if line.startswith('<a href') and line.find(PackageIndex.FILE_SUFFIX) >= 0:
+                    name = line[line.find('>') + 1:line.rfind('</a><br/>')]
+                    version = _guess_name_and_version(name)[1]
+                    result.append(version)
 
-        return result
+            return result
+        except urllib2.URLError:
+            return sorted(list(self._package_index.list_versions(name)))
 
 
 class UniqueIterator(object):
