@@ -114,12 +114,14 @@ def ensure_list_versions_retrieves_versions_from_pypi (temp_dir):
 <a href='package-1.2.3.egg'>package-1.2.3.egg</a><br/>
 <a href='package-2.3.4.egg'>package-2.3.4.egg</a><br/>
 <a href='package-2.3.4.tar.gz'>package-2.3.4.tar.gz</a><br/>
+<a href="package-3.01.tar.gz" rel="download">3.01 download_url</a><br/>
+<a href="package" rel="homepage">3.02 home_page</a><br/>
 </body></html>""")
     when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenReturn(package_stream)
 
     actual_list = proxy_package_index.list_versions("package")
 
-    assert_that(actual_list).is_equal_to(['0.1.2', '1.2.3', '2.3.4'])
+    assert_that(actual_list).is_equal_to(['0.1.2', '1.2.3', '2.3.4', '3.01'])
     verify(pypiproxy.packageindex.urllib2).urlopen("http://pypi.python.org/simple/package/")
 
 @test
