@@ -19,6 +19,7 @@ from pyfix import after, test, given
 from pyfix.fixtures import TemporaryDirectoryFixture
 from pyassert import assert_that
 from mockito import when, mock, unstub, verify, any as any_value
+from StringIO import StringIO
 
 
 from pypiproxy.packageindex import ProxyPackageIndex
@@ -77,7 +78,6 @@ def ensure_proxy_gets_package_content_from_pypi_if_it_is_not_cached (temp_dir):
 @after(unstub)
 def ensure_list_available_package_names_retrieves_index_from_pypi (temp_dir):
     proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")
-    from StringIO import StringIO
     package_stream = StringIO("""<!doctype html><html><body>
 <a href='alpha'>alpha</a><br/>
 <a href='beta'>beta</a><br/>
@@ -95,7 +95,6 @@ def ensure_list_available_package_names_retrieves_index_from_pypi (temp_dir):
 @after(unstub)
 def ensure_list_versions_retrieves_versions_from_pypi (temp_dir):
     proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")
-    from StringIO import StringIO
     package_stream = StringIO("""<!doctype html><html><body>
 <a href='package-0.1.2.tar.gz'>package-0.1.2.tar.gz</a><br/>
 <a href='package-1.2.3.tar.gz'>package-1.2.3.tar.gz</a><br/>
