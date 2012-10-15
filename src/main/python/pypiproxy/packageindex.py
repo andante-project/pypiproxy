@@ -55,13 +55,13 @@ class PackageIndex(object):
     def directory(self):
         return self._directory
 
-    def add_package(self, name, version, content_stream):
+    def add_package(self, name, version, content):
         filename = self._filename_from_name_and_version(name, version)
 
-        LOGGER.info("Adding package '%s %s' to file '%s'", name, version, filename)
+        LOGGER.info("Adding package {0} in version {1} as file {2}".format(name, version, filename))
 
         with open(filename, "wb") as package_file:
-            package_file.write(content_stream)
+            package_file.write(content)
 
     def contains(self, name, version="*"):
         filename = self._filename_from_name_and_version(name, version)
@@ -112,17 +112,39 @@ class ProxyPackageIndex(object):
         if not self._package_index.contains(name, version):
             filename = "{0}-{1}{2}".format(name, version, PackageIndex.FILE_SUFFIX)
             package_url = "{0}/packages/source/{1}/{2}/{3}".format(self._pypi_url, name[0], name, filename)
-            package_stream = urllib2.urlopen(package_url)
+            LOGGER.info("Downloading package {0} in version {1} from {2}".format(name, version, package_url))
+            content = urllib2.urlopen(package_url).read()
 
-            self._package_index.add_package(name, version, package_stream)
+            self._package_index.add_package(name, version, content)
 
         return self._package_index.get_package_content(name, version)
 
     def list_available_package_names(self):
-        raise NotImplementedError()
+        index_url = "{0}/simple/".format(self._pypi_url)
+        LOGGER.info("Downloading index from {0}".format(index_url))
+        index_stream = urllib2.urlopen(index_url)
+
+        result = []
+        for line in index_stream:
+            if line.startswith('<a href'):
+                name = line[line.find('>') + 1:line.rfind('</a><br/>')]
+                result.append(name)
+
+        return result
 
     def list_versions(self, name):
-        return self._package_index.list_versions(name)
+        versions_url = "{0}/simple/{1}/".format(self._pypi_url, name)
+        LOGGER.info("Downloading versions from {0}".format(versions_url))
+        versions_stream = urllib2.urlopen(versions_url)
+
+        result = []
+        for line in versions_stream:
+            if line.startswith('<a href') and line.find(PackageIndex.FILE_SUFFIX) >= 0:
+                name = line[line.find('>') + 1:line.rfind('</a><br/>')]
+                version = _guess_name_and_version(name)[1]
+                result.append(version)
+
+        return result
 
 
 class UniqueIterator(object):

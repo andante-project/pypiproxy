@@ -67,7 +67,7 @@ def list_available_package_names():
     cached_packages = _proxy_packages_index.list_available_package_names()
     hosted_packages = _hosted_packages_index.list_available_package_names()
 
-    return sorted(cached_packages + hosted_packages)
+    return sorted(list(cached_packages) + list(hosted_packages))
 
 def list_versions(name):
     """
