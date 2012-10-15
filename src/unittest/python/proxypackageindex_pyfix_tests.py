@@ -72,6 +72,43 @@ def ensure_proxy_gets_package_content_from_pypi_if_it_is_not_cached (temp_dir):
     verify(pypiproxy.packageindex.urllib2).urlopen("http://pypi.python.org/packages/source/p/pyassert/pyassert-0.2.5.tar.gz")
     verify(proxy_package_index._package_index).add_package("pyassert", "0.2.5", stream_content)
 
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+@after(unstub)
+def ensure_list_available_package_names_retrieves_index_from_pypi (temp_dir):
+    proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")
+    from StringIO import StringIO
+    package_stream = StringIO("""<!doctype html><html><body>
+<a href='alpha'>alpha</a><br/>
+<a href='beta'>beta</a><br/>
+<a href='gamma'>gamma</a><br/>
+</body></html>""")
+    when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenReturn(package_stream)
+
+    actual_list = proxy_package_index.list_available_package_names()
+
+    assert_that(actual_list).is_equal_to(['alpha', 'beta', 'gamma'])
+    verify(pypiproxy.packageindex.urllib2).urlopen("http://pypi.python.org/simple/")
+
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+@after(unstub)
+def ensure_list_versions_retrieves_versions_from_pypi (temp_dir):
+    proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")
+    from StringIO import StringIO
+    package_stream = StringIO("""<!doctype html><html><body>
+<a href='package-0.1.2.tar.gz'>package-0.1.2.tar.gz</a><br/>
+<a href='package-1.2.3.tar.gz'>package-1.2.3.tar.gz</a><br/>
+<a href='package-1.2.3.egg'>package-1.2.3.egg</a><br/>
+<a href='package-2.3.4.egg'>package-2.3.4.egg</a><br/>
+<a href='package-2.3.4.tar.gz'>package-2.3.4.tar.gz</a><br/>
+</body></html>""")
+    when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenReturn(package_stream)
+
+    actual_list = proxy_package_index.list_versions("package")
+
+    assert_that(actual_list).is_equal_to(['0.1.2', '1.2.3', '2.3.4'])
+    verify(pypiproxy.packageindex.urllib2).urlopen("http://pypi.python.org/simple/package/")
 
 if __name__ == "__main__":
     from pyfix import run_tests

@@ -1,5 +1,5 @@
 #   pypiproxy
-#   Copyright 2012 Michael Gruber, Alexander Metzner
+#   Copyright 2012 Michael Gruber, Alexander Metzner, Maximilien Riehl
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 	A proxy server for the python package index.
 """
 
-__author__ = 'Michael Gruber, Alexander Metzner'
+__author__ = 'Michael Gruber, Alexander Metzner, Maximilien Riehl'
 
 from pythonbuilder.core import init, use_plugin, Author
 
@@ -35,10 +35,11 @@ use_plugin("python.install_dependencies")
 
 default_task = ["analyze", "publish"]
 
-version = "0.2.2"
+version = "0.2.3"
 summary = "A proxy server for the python package index."
 authors = (Author("Alexander Metzner", "halimath.wilanthaou@gmail.com"),
-		   Author("Michael Gruber", "aelgru@gmail.com"))
+		   Author("Michael Gruber", "aelgru@gmail.com"),
+		   Author("Maximilien Riehl", "maximilien.riehl@gmail.com"))
 url = "https://github.com/aelgru/pypiproxy"
 license = "Apache License, Version 2.0"
 

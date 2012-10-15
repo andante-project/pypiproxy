@@ -126,9 +126,12 @@ class ProxyPackageIndex(object):
 
         result = []
         for line in index_stream:
+            line = line.decode("utf8")
             if line.startswith('<a href'):
                 name = line[line.find('>') + 1:line.rfind('</a><br/>')]
                 result.append(name)
+
+        index_stream.close()
 
         return result
 
@@ -139,6 +142,7 @@ class ProxyPackageIndex(object):
 
         result = []
         for line in versions_stream:
+            line = line.decode("utf8")
             if line.startswith('<a href') and line.find(PackageIndex.FILE_SUFFIX) >= 0:
                 name = line[line.find('>') + 1:line.rfind('</a><br/>')]
                 version = _guess_name_and_version(name)[1]
