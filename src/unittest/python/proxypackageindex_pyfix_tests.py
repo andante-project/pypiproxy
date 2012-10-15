@@ -59,16 +59,18 @@ def ensure_proxy_gets_package_content_from_pypi_if_it_is_not_cached (temp_dir):
     proxy_package_index._package_index = mock()
     package_stream = mock()
     package_content = mock()
+    stream_content = mock()
     when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenReturn(package_stream)
     when(proxy_package_index._package_index).contains(any_value(), any_value()).thenReturn(False)
     when(proxy_package_index._package_index).get_package_content(any_value(), any_value()).thenReturn(package_content)
+    when(package_stream).read().thenReturn(stream_content)
 
     actual_package = proxy_package_index.get_package_content("pyassert", "0.2.5")
 
     assert_that(actual_package).is_equal_to(package_content)
     verify(proxy_package_index._package_index).get_package_content("pyassert", "0.2.5")
     verify(pypiproxy.packageindex.urllib2).urlopen("http://pypi.python.org/packages/source/p/pyassert/pyassert-0.2.5.tar.gz")
-    verify(proxy_package_index._package_index).add_package("pyassert", "0.2.5", package_stream)
+    verify(proxy_package_index._package_index).add_package("pyassert", "0.2.5", stream_content)
 
 
 if __name__ == "__main__":
