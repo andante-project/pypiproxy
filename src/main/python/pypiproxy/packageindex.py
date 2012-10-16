@@ -157,6 +157,8 @@ class ProxyPackageIndex(object):
                 line = line.decode("utf8")
                 if line.startswith('<a href') and line.find(PackageIndex.FILE_SUFFIX) >= 0:
                     name = _href_from(line)
+                    if "#md5" in name :
+                        name = name[0:name.rfind('#md5')]
                     version = _guess_name_and_version(name)[1]
                     result.append(version)
 
