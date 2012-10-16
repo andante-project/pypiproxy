@@ -27,7 +27,7 @@ use_plugin("python.core")
 use_plugin("python.pyfix_unittest")
 use_plugin("python.integrationtest")
 use_plugin("python.coverage")
-use_plugin("python.pychecker")
+#use_plugin("python.pychecker")
 use_plugin("python.pydev")
 use_plugin("python.distutils")
 
