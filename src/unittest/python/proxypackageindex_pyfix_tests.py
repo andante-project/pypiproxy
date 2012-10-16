@@ -142,6 +142,28 @@ def ensure_list_versions_delegates_to_cached_versions_when_to_download_versions_
     assert_that(actual_list).is_equal_to(['0.1.2', '1.2.3', '2.3.4'])
     verify(pypiproxy.packageindex.urllib2).urlopen("http://pypi.python.org/simple/spam/")
 
+
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+@after(unstub)
+def ensure_list_versions_retrieves_versions_from_pypi (temp_dir):
+    proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")
+    package_stream = StringIO("""<!doctype html><html><body>
+<a href='package-0.1.2.tar.gz#md5=foobar'>package-0.1.2.tar.gz</a><br/>
+<a href='package-1.2.3.tar.gz#md5=foobar'>package-1.2.3.tar.gz</a><br/>
+<a href='package-1.2.3.egg#md5=foobar'>package-1.2.3.egg</a><br/>
+<a href='package-2.3.4.egg#md5=foobar'>package-2.3.4.egg</a><br/>
+<a href='package-2.3.4.tar.gz#md5=foobar'>package-2.3.4.tar.gz</a><br/>
+<a href="package-3.01.tar.gz#md5=foobar" rel="download">3.01 download_url</a><br/>
+<a href="package" rel="homepage">3.02 home_page</a><br/>
+</body></html>""")
+    when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenReturn(package_stream)
+
+    actual_list = proxy_package_index.list_versions("package")
+
+    assert_that(actual_list).is_equal_to(['0.1.2', '1.2.3', '2.3.4', '3.01'])
+    verify(pypiproxy.packageindex.urllib2).urlopen("http://pypi.python.org/simple/package/")
+
 if __name__ == "__main__":
     from pyfix import run_tests
 
