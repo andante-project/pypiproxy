@@ -44,7 +44,7 @@ url = "https://github.com/aelgru/pypiproxy"
 license = "Apache License, Version 2.0"
 
 @init
-def init (project):
+def initialize (project):
     project.build_depends_on("mockito")
     project.build_depends_on("pyassert")
 
