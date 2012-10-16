@@ -40,12 +40,6 @@ def _guess_name_and_version(filename):
 
     raise ValueError("Invalid package file name: '{0}'".format(filename))
 
-def _href_from(text):
-    hrefs = _HREF_PATTERN.findall(text)
-    if len(hrefs) is not 1:
-        raise ValueError("Invalid link contains multiple href values")
-    return hrefs[0]
-
 
 class PackageIndex(object):
     FILE_SUFFIX = ".tar.gz"
@@ -129,43 +123,65 @@ class ProxyPackageIndex(object):
         return self._package_index.get_package_content(name, version)
 
     def list_available_package_names(self):
-        try:
-            index_url = "{0}/simple/".format(self._pypi_url)
-            LOGGER.info("Downloading index from {0}".format(index_url))
-            index_stream = urllib2.urlopen(index_url)
+        pypi_index_url = "{0}/simple/".format(self._pypi_url)
+        LOGGER.info("Downloading index from {0}".format(pypi_index_url))
 
-            result = []
-            for line in index_stream:
-                line = line.decode("utf8")
-                if line.startswith('<a href'):
-                    name = line[line.find('>') + 1:line.rfind('</a><br/>')]
-                    result.append(name)
-
-            index_stream.close()
-            return result
-        except urllib2.URLError:
+        index_content = self._fetch_url(pypi_index_url)
+        if index_content is not None:
+            return self._extract_package_names(index_content)
+        else:
             return sorted(list(self._package_index.list_available_package_names()))
 
     def list_versions(self, name):
-        try:
-            versions_url = "{0}/simple/{1}/".format(self._pypi_url, name)
-            LOGGER.info("Downloading versions from {0}".format(versions_url))
-            versions_stream = urllib2.urlopen(versions_url)
+        versions_url = "{0}/simple/{1}/".format(self._pypi_url, name)
+        LOGGER.info("Downloading versions from {0}".format(versions_url))
+        versions_content = self._fetch_url(versions_url)
 
-            result = []
-            for line in versions_stream:
-                line = line.decode("utf8")
-                if line.startswith('<a href') and line.find(PackageIndex.FILE_SUFFIX) >= 0:
-                    name = _href_from(line)
-                    if "#md5" in name :
-                        name = name[0:name.rfind('#md5')]
-                    version = _guess_name_and_version(name)[1]
-                    result.append(version)
-
-            return result
-        except urllib2.URLError:
+        if versions_content is not None:
+            return self._extract_versions(versions_content)
+        else:
             return sorted(list(self._package_index.list_versions(name)))
 
+    def _extract_package_names(self, index_content):
+        result = []
+        for line in index_content.split('\n'):
+            if line.startswith('<a href'):
+                name = self._extract_package_name_from_link(line)
+                result.append(name)
+        return result
+
+    def _extract_package_name_from_link(self, line):
+        return line[line.find('>') + 1:line.rfind('</a><br/>')]
+
+    def _extract_versions(self, versions_content):
+        result = []
+        for line in versions_content.split("\n"):
+            line = line.decode("utf8")
+            if line.startswith('<a href') and line.find(PackageIndex.FILE_SUFFIX) >= 0:
+                name = self._href_from(line)
+                if "#md5" in name:
+                    name = name[0:name.rfind('#md5')]
+                version = _guess_name_and_version(name)[1]
+                result.append(version)
+        return result
+
+    def _href_from(self, text):
+        hrefs = _HREF_PATTERN.findall(text)
+        if len(hrefs) is not 1:
+            raise ValueError("Invalid link contains multiple href values")
+        return hrefs[0]
+
+    def _fetch_url(self, url):
+        stream = None
+        try:
+            stream = urllib2.urlopen(url)
+            return stream.read().decode("utf8")
+        except urllib2.URLError as e:
+            LOGGER.warn("Could not fetch {0}: {1}".format(url, e))
+            return None
+        finally:
+            if stream is not None:
+                stream.close()
 
 class UniqueIterator(object):
     """
