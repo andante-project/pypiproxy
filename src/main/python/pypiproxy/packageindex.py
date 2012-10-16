@@ -101,8 +101,6 @@ class PackageIndex(object):
         return itertools.imap(_guess_name_and_version, self._read_files())
 
 
-
-
 class ProxyPackageIndex(object):
     """
     Retrieves the packages from another pypi and stores them in a package index. 
@@ -116,7 +114,7 @@ class ProxyPackageIndex(object):
             filename = "{0}-{1}{2}".format(name, version, PackageIndex.FILE_SUFFIX)
             package_url = "{0}/packages/source/{1}/{2}/{3}".format(self._pypi_url, name[0], name, filename)
             LOGGER.info("Downloading package {0} in version {1} from {2}".format(name, version, package_url))
-            content = urllib2.urlopen(package_url).read()
+            content = self._fetch_url(package_url, raw=True)
 
             self._package_index.add_package(name, version, content)
 
@@ -171,11 +169,15 @@ class ProxyPackageIndex(object):
             raise ValueError("Invalid link contains multiple href values")
         return hrefs[0]
 
-    def _fetch_url(self, url):
+    def _fetch_url(self, url, raw=False):
         stream = None
         try:
             stream = urllib2.urlopen(url)
-            return stream.read().decode("utf8")
+            raw_content = stream.read()
+            if raw:
+                return raw_content
+            else:
+                return raw_content.decode("utf8")
         except urllib2.URLError as e:
             LOGGER.warn("Could not fetch {0}: {1}".format(url, e))
             return None
