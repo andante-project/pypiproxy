@@ -25,6 +25,7 @@ import urllib2
 LOGGER = logging.getLogger("pypiproxy.packageindex")
 
 _PACKAGE_NAME_AND_VERSION_PATTERN = re.compile(r"^(.*?)(-([0-9.]+.*)).tar.gz$")
+_HREF_PATTERN = re.compile(r'href=[\'"]?([^\'" >]+)')
 
 def _guess_name_and_version(filename):
     result = _PACKAGE_NAME_AND_VERSION_PATTERN.match(filename)
@@ -38,6 +39,12 @@ def _guess_name_and_version(filename):
         return filename[0:split_index], filename[split_index + 1:]
 
     raise ValueError("Invalid package file name: '{0}'".format(filename))
+
+def _href_from(text):
+    hrefs = _HREF_PATTERN.findall(text)
+    if len(hrefs) is not 1:
+        raise ValueError("Invalid link contains multiple href values")
+    return hrefs[0]
 
 
 class PackageIndex(object):
@@ -100,6 +107,8 @@ class PackageIndex(object):
         return itertools.imap(_guess_name_and_version, self._read_files())
 
 
+
+
 class ProxyPackageIndex(object):
     """
     Retrieves the packages from another pypi and stores them in a package index. 
@@ -147,7 +156,7 @@ class ProxyPackageIndex(object):
             for line in versions_stream:
                 line = line.decode("utf8")
                 if line.startswith('<a href') and line.find(PackageIndex.FILE_SUFFIX) >= 0:
-                    name = line[line.find('>') + 1:line.rfind('</a><br/>')]
+                    name = _href_from(line)
                     version = _guess_name_and_version(name)[1]
                     result.append(version)
 
