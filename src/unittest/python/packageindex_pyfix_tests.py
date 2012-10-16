@@ -41,6 +41,9 @@ def guess_name_and_version_should_understand_single_digit_version():
 def guess_name_and_version_should_understand_simple_version():
     assert_that(_guess_name_and_version("spam-1.2.tar.gz")).is_equal_to(("spam", "1.2"))
 
+@test
+def guess_name_and_version_should_ignore_checksum():
+    assert_that(_guess_name_and_version("spam-1.2.tar.gz#md5=5beb1e1b3c243d3ca078fe1ea9d6dbd8")).is_equal_to(("spam", "1.2"))
 
 @test
 def guess_name_and_version_should_understand_simple_version_with_suffix():
