@@ -76,7 +76,7 @@ def list_versions(name):
     LOGGER.debug("Listing versions for package '%s'", name)
 
     if _hosted_packages_index.contains(name):
-        LOGGER.debug("Package '{0}' is not hosted.".format(name))
+        LOGGER.debug("Package '{0}' is hosted.".format(name))
         return _hosted_packages_index.list_versions(name)
 
     LOGGER.debug("Listing cached versions for package '{0}'.".format(name))
