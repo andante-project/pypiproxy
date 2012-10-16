@@ -92,25 +92,48 @@ def should_return_given_pypi_url_when_pypi_url_option_is_given(temp_dir):
 
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
-def should_raise_exception_when_no_packages_directory_option_is_given_and_director_is_retrieved(temp_dir):
+def should_raise_exception_when_no_hosted_packages_directory_option_is_given_and_directory_is_retrieved(temp_dir):
     temp_dir.create_file("config.cfg", "[{0}]".format(Configuration.SECTION))
 
     config = Configuration(temp_dir.join("config.cfg"))
 
     def callback():
-        config.packages_directory
+        config.hosted_packages_directory
+
+    assert_that(callback).raises(ValueError)
+
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+def should_raise_exception_when_no_cached_packages_directory_option_is_given_and_directory_is_retrieved(temp_dir):
+    temp_dir.create_file("config.cfg", "[{0}]".format(Configuration.SECTION))
+
+    config = Configuration(temp_dir.join("config.cfg"))
+
+    def callback():
+        config.cached_packages_directory
 
     assert_that(callback).raises(ValueError)
 
 
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
-def should_return_given_packages_directory_when_packages_directory_option_is_given(temp_dir):
+def should_return_given_hosted_packages_directory_when_packages_directory_option_is_given(temp_dir):
+
     temp_dir.create_file("config.cfg",
-        "[{0}]\n{1}=packages/dir".format(Configuration.SECTION, Configuration.OPTION_PACKAGES_DIRECTORY))
+        "[{0}]\n{1}=packages/hosted".format(Configuration.SECTION, Configuration.OPTION_HOSTED_PACKAGES_DIRECTORY))
 
     config = Configuration(temp_dir.join("config.cfg"))
-    assert_that(config.packages_directory).is_equal_to("packages/dir")
+    assert_that(config.hosted_packages_directory).is_equal_to("packages/hosted")
+
+
+@test
+@given(temp_dir=TemporaryDirectoryFixture)
+def should_return_given_cached_packages_directory_when_packages_directory_option_is_given(temp_dir):
+    temp_dir.create_file("config.cfg",
+        "[{0}]\n{1}=packages/cached".format(Configuration.SECTION, Configuration.OPTION_CACHED_PACKAGES_DIRECTORY))
+
+    config = Configuration(temp_dir.join("config.cfg"))
+    assert_that(config.cached_packages_directory).is_equal_to("packages/cached")
 
 
 if __name__ == '__main__':

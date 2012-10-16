@@ -20,7 +20,9 @@ import ConfigParser
 class Configuration(object):
     SECTION = "pypiproxy"
     OPTION_LOG_FILE = "log_file"
-    OPTION_PACKAGES_DIRECTORY = "packages_directory"
+    OPTION_HOSTED_PACKAGES_DIRECTORY = "hosted_packages_directory"
+    OPTION_CACHED_PACKAGES_DIRECTORY = "cached_packages_directory"
+
     OPTION_PYPI_URL = "pypi_url"
 
     DEFAULT_LOG_FILE = "/var/log/pypiproxy.log"
@@ -37,8 +39,12 @@ class Configuration(object):
         return self._get_option(Configuration.OPTION_LOG_FILE, Configuration.DEFAULT_LOG_FILE)
 
     @property
-    def packages_directory(self):
-        return self._get_option(Configuration.OPTION_PACKAGES_DIRECTORY)
+    def hosted_packages_directory(self):
+        return self._get_option(Configuration.OPTION_HOSTED_PACKAGES_DIRECTORY)
+
+    @property
+    def cached_packages_directory(self):
+        return self._get_option(Configuration.OPTION_CACHED_PACKAGES_DIRECTORY)
 
     @property
     def pypi_url(self):

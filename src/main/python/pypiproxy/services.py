@@ -25,12 +25,12 @@ LOGGER = logging.getLogger("pypiproxy.services")
 _hosted_packages_index = None
 _proxy_packages_index = None
 
-def initialize_services(packages_directory, pypi_url):
+def initialize_services(hosted_packages_directory, cached_packages_directory, pypi_url):
     global _hosted_packages_index
-    _hosted_packages_index = PackageIndex("hosted", os.path.join(packages_directory, "hosted"))
+    _hosted_packages_index = PackageIndex("hosted", hosted_packages_directory)
 
     global _proxy_packages_index
-    _proxy_packages_index = ProxyPackageIndex("cached", os.path.join(packages_directory, "cached"), pypi_url)
+    _proxy_packages_index = ProxyPackageIndex("cached", cached_packages_directory, pypi_url)
 
 def add_package(name, version, content_stream):
     LOGGER.debug("Adding package '%s %s'", name, version)
