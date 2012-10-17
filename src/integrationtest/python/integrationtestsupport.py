@@ -2,12 +2,10 @@ import httplib
 import urllib2
 
 from StringIO import StringIO
-from werkzeug.datastructures import ImmutableList
 
 
 def download(url):
     return urllib2.urlopen(url, timeout=2).read()
-
 
 def upload():
     return UploadBuilder()
@@ -41,7 +39,8 @@ class UploadBuilder:
                                 .form_field(":action", "file_upload") \
                                 .form_field("name", self._package_name) \
                                 .form_field("version", self._package_version) \
-                                .file(self._file_name, self._file_content).build()
+                                .file(self._file_name, self._file_content) \
+                            .build()
 
         return send_post_request(server.host, server.port, "/", multi_part_request)
 
