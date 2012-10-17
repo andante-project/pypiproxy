@@ -2,6 +2,7 @@ import httplib
 import urllib2
 
 from StringIO import StringIO
+from werkzeug.datastructures import ImmutableList
 
 
 def download(url):
@@ -36,11 +37,16 @@ class UploadBuilder:
         return self
 
     def to(self, server):
-        raw_params = {":action": "file_upload",
+        form_fields = {":action": "file_upload",
                       "name": self._package_name,
                       "version": self._package_version}
-        return MultiPartRequestBuilder().form_data(raw_params).file(self._file_name, self._file_content).send_post_request(server.host, server.port, "/")
+        multi_part_request = MultiPartRequestBuilder().form_data(form_fields).file(self._file_name, self._file_content).build()
+        return send_post_request(server.host, server.port, "/", multi_part_request)
 
+class MultiPartRequest(object):
+    def __init__(self, body, headers):
+        self.body = body
+        self.headers = headers
 
 class MultiPartRequestBuilder (object):
     def __init__(self):
@@ -66,14 +72,15 @@ class MultiPartRequestBuilder (object):
         self._write_line(file_content)
         return self
 
-    def send_post_request(self, host, port, uri):
-        content_type = "multipart/form-data; boundary={0}".format(self.boundary)
-
+    def build(self):
         self._write_line("--{0}--".format(self.boundary))
         self._write_line()
 
         body = self.body_buffer.getvalue()
+        headers = {"Content-Type": "multipart/form-data; boundary={0}".format(self.boundary)}
+        return MultiPartRequest(body, headers)
 
-        http_connection = httplib.HTTPConnection(host=host, port=port)
-        http_connection.request("POST", uri, body, headers={"Content-Type": content_type})
-        return http_connection.getresponse().status
+def send_post_request(host, port, url, multi_part_request):
+    http_connection = httplib.HTTPConnection(host=host, port=port)
+    http_connection.request(method="POST", url=url, body=multi_part_request.body, headers=multi_part_request.headers)
+    return http_connection.getresponse().status
