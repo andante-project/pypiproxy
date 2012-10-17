@@ -13,38 +13,37 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-__author__ = "Alexander Metzner"
+__author__ = "Alexander Metzner, Michael Gruber, Maximilien Riehl"
 
 import ConfigParser
 
 class Configuration(object):
-    SECTION = "pypiproxy"
-    OPTION_LOG_FILE = "log_file"
-    OPTION_HOSTED_PACKAGES_DIRECTORY = "hosted_packages_directory"
-    OPTION_CACHED_PACKAGES_DIRECTORY = "cached_packages_directory"
-
-    OPTION_PYPI_URL = "pypi_url"
-
     DEFAULT_LOG_FILE = "/var/log/pypiproxy.log"
     DEFAULT_PYPI_URL = "http://pypi.python.org"
+
+    OPTION_CACHED_PACKAGES_DIRECTORY = "cached_packages_directory"
+    OPTION_HOSTED_PACKAGES_DIRECTORY = "hosted_packages_directory"
+    OPTION_LOG_FILE = "log_file"
+    OPTION_PYPI_URL = "pypi_url"
+
+    SECTION = "pypiproxy"
 
     def __init__(self, config_file_name):
         self._config_parser = ConfigParser.RawConfigParser()
         self._load_config_file(config_file_name)
-
         self._verify_config()
 
     @property
-    def log_file(self):
-        return self._get_option(Configuration.OPTION_LOG_FILE, Configuration.DEFAULT_LOG_FILE)
+    def cached_packages_directory(self):
+        return self._get_option(Configuration.OPTION_CACHED_PACKAGES_DIRECTORY)
 
     @property
     def hosted_packages_directory(self):
         return self._get_option(Configuration.OPTION_HOSTED_PACKAGES_DIRECTORY)
 
     @property
-    def cached_packages_directory(self):
-        return self._get_option(Configuration.OPTION_CACHED_PACKAGES_DIRECTORY)
+    def log_file(self):
+        return self._get_option(Configuration.OPTION_LOG_FILE, Configuration.DEFAULT_LOG_FILE)
 
     @property
     def pypi_url(self):
@@ -63,7 +62,6 @@ class Configuration(object):
                 raise ValueError("Failed to load config file '{0}'".format(config_file_name))
         except ConfigParser.Error as e:
             raise ValueError("Error loading config file: {0}".format(e))
-
 
     def _verify_config(self):
         if not self._config_parser.has_section(Configuration.SECTION):

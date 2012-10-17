@@ -27,7 +27,7 @@ class LiveServer():
         self.port = 5000
         self.protocol = "http"
 
-        self.url = "%s://%s:%s/"%(self.protocol, self.host, self.port)
+        self.url = "%s://%s:%s/" % (self.protocol, self.host, self.port)
 
     def __enter__(self):
         self.start_server_process()

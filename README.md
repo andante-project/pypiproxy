@@ -1,4 +1,17 @@
 pypiproxy [![Build Status](https://secure.travis-ci.org/yadt/pypiproxy.png)](http://travis-ci.org/yadt/pypiproxy)
 =========
 
-Simple PyPI Implementation
+This PyPI implementation has been created *contiunous delivery* in mind.
+*pypiproxy* will cache the requested artefacts and will deliver them if the public cheeseshop is not reachable.
+
+## Uploading a .tar.gz
+
+```bash
+python setup.py sdist upload -r http://pypiproxy.domain:1234/
+```
+
+## Installing a .tar.gz using pip
+
+```bash
+pip install flask --index http://pypiproxy.domain:1234/simple
+```

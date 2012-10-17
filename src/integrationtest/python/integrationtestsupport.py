@@ -13,8 +13,8 @@ def upload():
 
 class UploadBuilder:
     def __init__ (self):
-        self._file_name = "filename.txt"
         self._file_content = "file content"
+        self._file_name = "filename.txt"
         self._package_name = "package_name"
         self._package_version = "0.1.2"
 
@@ -67,13 +67,13 @@ class MultiPartRequestBuilder (object):
         self.file_name = "default.txt"
         self.form_fields = {}
 
-    def form_field(self, key, value):
-        self.form_fields[key] = value
-        return self
-
     def file(self, file_name, file_content):
         self.file_name = file_name
         self.file_content = file_content
+        return self
+
+    def form_field(self, key, value):
+        self.form_fields[key] = value
         return self
 
     def build(self):
