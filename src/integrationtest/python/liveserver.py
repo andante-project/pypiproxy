@@ -37,10 +37,11 @@ class LiveServer():
     def __exit__(self, exception_type, exception_value, traceback):
         self.stop_server_process()
 
-    def start_server_process(self):
-        worker = lambda app, port: app.run(port=port)
-        self._process = multiprocessing.Process(target=worker, args=(self.application, self.port))
-        self._process.start()
+    def touch_cached_file(self, *path_elements):
+        self._touch_file(self._join(self.configuration.cached_packages_directory, *path_elements))
+
+    def touch_hosted_file(self, *path_elements):
+        self._touch_file(self._join(self.configuration.hosted_packages_directory, *path_elements))
 
     def is_server_reachable(self):
         try:
@@ -49,8 +50,26 @@ class LiveServer():
         except:
             return False
 
+    def start_server_process(self):
+        worker = lambda app, port: app.run(port=port)
+        self._process = multiprocessing.Process(target=worker, args=(self.application, self.port))
+        self._process.start()
+
     def stop_server_process(self):
         self._process.terminate()
+
+    def _touch_file(self, file_name):
+        f = open(file_name, "w")
+        try:
+            f.write("")
+        finally:
+            f.close()
+
+    def _join(self, base_path, *path_elements):
+        path_elements = [base_path] + list(path_elements)
+        return os.path.join(*path_elements)
+
+
 
 def _remove_directory_if_exists(directory):
     if os.path.exists(directory):
