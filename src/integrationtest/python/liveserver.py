@@ -42,14 +42,14 @@ class LiveServer():
         self.port = 5000
         self.protocol = "http"
 
-        self.url = "%s://%s:%s"%(self.protocol, self.host, self.port)
+        self.url = "%s://%s:%s/"%(self.protocol, self.host, self.port)
 
     def __enter__(self):
         self.start_server_process()
         wait_for(self.is_server_reachable)
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exception_type, exception_value, traceback):
         self.stop_server_process()
 
     def start_server_process(self):

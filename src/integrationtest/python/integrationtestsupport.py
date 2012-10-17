@@ -1,5 +1,10 @@
 import httplib
-import mimetypes
+import urllib2
+
+
+
+def download(url):
+    return urllib2.urlopen(url, timeout=2).read()
 
 def upload():
     return UploadBuilder()
@@ -28,10 +33,11 @@ class UploadBuilder:
         return self
 
     def to(self, server):
-        raw_params = {':action':'file_upload',
-                      'name':self._package_name,
-                      'version':self._package_version}
+        raw_params = {':action': 'file_upload',
+                      'name': self._package_name,
+                      'version': self._package_version}
         return _post_multipart(server.host, server.port, "/", raw_params, self._file_name, self._file_content)
+
 
 
 def _create_form_part(boundary, form_fields):
