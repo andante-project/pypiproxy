@@ -1,7 +1,7 @@
 from integrationtestsupport import download
 from liveserver import LiveServer
 from pyassert import assert_that
-from pyfix import after, before, given, test, run_tests
+from pyfix import test, run_tests
 from staticpypi import StaticPyPiServer
 
 @test

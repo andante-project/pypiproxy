@@ -2,7 +2,7 @@ from httplib import OK
 from integrationtestsupport import upload
 from liveserver import LiveServer
 from pyassert import assert_that
-from pyfix import after, before, given, test, run_tests
+from pyfix import test, run_tests
 
 @test
 def integration_test():
