@@ -36,40 +36,38 @@ class UploadBuilder:
         raw_params = {':action': 'file_upload',
                       'name': self._package_name,
                       'version': self._package_version}
-        return _post_multipart(server.host, server.port, "/", raw_params, self._file_name, self._file_content)
+        return MultiPartRequestBuilder().form_data(raw_params).file(self._file_name, self._file_content).send_post_request(server.host, server.port, "/")
 
 
-def _create_form_part(boundary, form_fields):
-    result = []
-    for key, value in form_fields.iteritems():
-        result.append('--' + boundary)
-        result.append('Content-Disposition: form-data; name="%s"' % key)
-        result.append('')
-        result.append(value)
-    return result
+class MultiPartRequestBuilder (object):
+    def __init__(self):
+        self.boundary = '---------abcdefghijklmnop$'
+        self.body_lines = []
 
-def _create_file_part(boundary, file_name, file_content):
-    result = []
-    result.append('--' + boundary)
-    result.append('Content-Disposition: form-data; name="content"; filename="%s"' % file_name)
-    result.append('Content-Type: application/x-tar')
-    result.append('')
-    result.append(file_content)
-    return result
+    def form_data(self, form_fields):
+        for key, value in form_fields.iteritems():
+            self.body_lines.append('--' + self.boundary)
+            self.body_lines.append('Content-Disposition: form-data; name="%s"' % key)
+            self.body_lines.append('')
+            self.body_lines.append(value)
+        return self
 
-def _post_multipart(host, port, uri, form_fields, file_name, file_content):
-    boundary = '----------bound@ry_$'
-    content_type = 'multipart/form-data; boundary=%s' % boundary
-    body_lines = []
+    def file(self, file_name, file_content):
+        self.body_lines.append('--' + self.boundary)
+        self.body_lines.append('Content-Disposition: form-data; name="content"; filename="%s"' % file_name)
+        self.body_lines.append('Content-Type: application/x-tar')
+        self.body_lines.append('')
+        self.body_lines.append(file_content)
+        return self
 
-    body_lines.extend(_create_form_part(boundary, form_fields))
-    body_lines.extend(_create_file_part(boundary, file_name, file_content))
+    def send_post_request(self, host, port, uri):
+        content_type = 'multipart/form-data; boundary=%s' % self.boundary
 
-    body_lines.append('--' + boundary + '--')
-    body_lines.append('')
+        self.body_lines.append('--' + self.boundary + '--')
+        self.body_lines.append('')
 
-    body = '\n'.join(body_lines)
+        body = '\n'.join(self.body_lines)
 
-    http_connection = httplib.HTTPConnection(host=host, port=port)
-    http_connection.request('POST', uri, body, headers={'Content-Type': content_type})
-    return http_connection.getresponse().status
+        http_connection = httplib.HTTPConnection(host=host, port=port)
+        http_connection.request('POST', uri, body, headers={'Content-Type': content_type})
+        return http_connection.getresponse().status
