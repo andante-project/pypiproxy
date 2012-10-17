@@ -6,25 +6,10 @@ import time
 import urllib2
 
 CONFIGURATION_FILE = "src/integrationtest/python/pypiproxy_integrationtest.cfg"
-TIMEOUT_SECONDS = 0.05
 MAX_WAITING_SECONDS = 10
-
-def _remove_directory_if_exists(directory):
-    if os.path.exists(directory):
-        shutil.rmtree(directory)
-
-def wait_for(expression_to_be_true, max_waiting_seconds=MAX_WAITING_SECONDS, interval_seconds=TIMEOUT_SECONDS):
-    waited_seconds = 0
-    succeeded = False
-    while (not succeeded) and (waited_seconds < max_waiting_seconds):
-        succeeded = expression_to_be_true()
-        time.sleep(interval_seconds)
-        waited_seconds += interval_seconds
-
-    return succeeded
+TIMEOUT_SECONDS = 0.05
 
 class LiveServer():
-
     def __init__(self):
         self.configuration = pypiproxy.configuration.Configuration(CONFIGURATION_FILE)
 
@@ -46,7 +31,7 @@ class LiveServer():
 
     def __enter__(self):
         self.start_server_process()
-        wait_for(self.is_server_reachable)
+        _wait_for(self.is_server_reachable)
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
@@ -66,4 +51,18 @@ class LiveServer():
 
     def stop_server_process(self):
         self._process.terminate()
+
+def _remove_directory_if_exists(directory):
+    if os.path.exists(directory):
+        shutil.rmtree(directory)
+
+def _wait_for(expression_to_be_true, max_waiting_seconds=MAX_WAITING_SECONDS, interval_seconds=TIMEOUT_SECONDS):
+    waited_seconds = 0
+    succeeded = False
+    while (not succeeded) and (waited_seconds < max_waiting_seconds):
+        succeeded = expression_to_be_true()
+        time.sleep(interval_seconds)
+        waited_seconds += interval_seconds
+
+    return succeeded
 

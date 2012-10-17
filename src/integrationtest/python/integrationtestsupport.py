@@ -1,13 +1,13 @@
 import httplib
 import urllib2
 
-
-
 def download(url):
     return urllib2.urlopen(url, timeout=2).read()
 
+
 def upload():
     return UploadBuilder()
+
 
 class UploadBuilder:
     def __init__ (self):
@@ -37,7 +37,6 @@ class UploadBuilder:
                       'name': self._package_name,
                       'version': self._package_version}
         return _post_multipart(server.host, server.port, "/", raw_params, self._file_name, self._file_content)
-
 
 
 def _create_form_part(boundary, form_fields):
@@ -75,4 +74,3 @@ def _post_multipart(host, port, uri, form_fields, file_name, file_content):
     http_connection = httplib.HTTPConnection(host=host, port=port)
     http_connection.request('POST', uri, body, headers={'Content-Type': content_type})
     return http_connection.getresponse().status
-
