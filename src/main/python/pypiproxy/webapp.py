@@ -20,7 +20,7 @@ import StringIO
 
 from flask import Flask, request, render_template, abort, make_response
 
-from pypiproxy import __version__ as version
+from . import __version__ as pypiproxy_version
 from .services import (list_available_package_names, list_versions, get_package_content, add_package,
                        get_package_statistics)
 
@@ -30,7 +30,7 @@ LOGGER = logging.getLogger("pypiproxy.webapp")
 application = Flask(__name__)
 
 def render_application_template(template_name, **template_parameters):
-    template_parameters["version"] = version
+    template_parameters["version"] = pypiproxy_version
     return render_template(template_name, **template_parameters)
 
 
