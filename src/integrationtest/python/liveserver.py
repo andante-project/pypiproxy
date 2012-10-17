@@ -5,7 +5,7 @@ import shutil
 import time
 import urllib2
 
-CONFIGURATION_FILE = "src/integrationtest/python/pypiproxy_integrationtest.cfg"
+CONFIGURATION_FILE = "src/integrationtest/resources/pypiproxy_integrationtest.cfg"
 MAX_WAITING_SECONDS = 10
 TIMEOUT_SECONDS = 0.05
 
