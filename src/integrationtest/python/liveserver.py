@@ -38,10 +38,10 @@ class LiveServer():
         self.stop_server_process()
 
     def touch_cached_file(self, *path_elements):
-        self._touch_file(self._join(self.configuration.cached_packages_directory, *path_elements))
+        self._touch_file(self._join(self.configuration.cached_packages_directory, *path_elements), "cached content")
 
     def touch_hosted_file(self, *path_elements):
-        self._touch_file(self._join(self.configuration.hosted_packages_directory, *path_elements))
+        self._touch_file(self._join(self.configuration.hosted_packages_directory, *path_elements), "hosted content")
 
     def is_server_reachable(self):
         try:
@@ -58,10 +58,10 @@ class LiveServer():
     def stop_server_process(self):
         self._process.terminate()
 
-    def _touch_file(self, file_name):
+    def _touch_file(self, file_name, content):
         f = open(file_name, "w")
         try:
-            f.write("")
+            f.write(content)
         finally:
             f.close()
 
