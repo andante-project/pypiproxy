@@ -22,7 +22,7 @@ class LiveServer():
 
         pypiproxy.initialize_logging(self.configuration.log_file)
 
-        self.app = pypiproxy.webapp.application
+        self.application = pypiproxy.webapp.application
         self.host = "127.0.0.1"
         self.port = 5000
         self.protocol = "http"
@@ -39,7 +39,7 @@ class LiveServer():
 
     def start_server_process(self):
         worker = lambda app, port: app.run(port=port)
-        self._process = multiprocessing.Process(target=worker, args=(self.app, self.port))
+        self._process = multiprocessing.Process(target=worker, args=(self.application, self.port))
         self._process.start()
 
     def is_server_reachable(self):

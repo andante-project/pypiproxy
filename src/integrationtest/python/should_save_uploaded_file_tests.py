@@ -1,8 +1,8 @@
+from httplib import OK
+from integrationtestsupport import upload
+from liveserver import LiveServer
 from pyassert import assert_that
 from pyfix import after, before, given, test, run_tests
-from liveserver import LiveServer
-from integrationtestsupport import upload
-from httplib import OK
 
 @test
 def integration_test():

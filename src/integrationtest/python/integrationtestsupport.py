@@ -48,7 +48,6 @@ def _create_form_part(boundary, form_fields):
         result.append(value)
     return result
 
-
 def _create_file_part(boundary, file_name, file_content):
     result = []
     result.append('--' + boundary)
@@ -69,7 +68,7 @@ def _post_multipart(host, port, uri, form_fields, file_name, file_content):
     body_lines.append('--' + boundary + '--')
     body_lines.append('')
 
-    body = '\r\n'.join(body_lines)
+    body = '\n'.join(body_lines)
 
     http_connection = httplib.HTTPConnection(host=host, port=port)
     http_connection.request('POST', uri, body, headers={'Content-Type': content_type})
