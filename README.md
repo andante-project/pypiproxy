@@ -1,8 +1,8 @@
 pypiproxy [![Build Status](https://secure.travis-ci.org/yadt/pypiproxy.png)](http://travis-ci.org/yadt/pypiproxy)
 =========
 
-This PyPI implementation has been created *contiunous delivery* in mind.
-*pypiproxy* will cache the requested artefacts and will deliver them if the public cheeseshop is not reachable.
+This PyPI implementation has been created with *continuous delivery* in mind.
+*pypiproxy* will cache the requested artifacts and will deliver them if the public cheeseshop is not reachable. 
 
 ## Uploading a .tar.gz
 
