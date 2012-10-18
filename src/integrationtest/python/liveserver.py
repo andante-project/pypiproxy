@@ -37,11 +37,11 @@ class LiveServer():
     def __exit__(self, exception_type, exception_value, traceback):
         self.stop_server_process()
 
-    def touch_cached_file(self, *path_elements):
-        self._touch_file(self._join(self.configuration.cached_packages_directory, *path_elements), "cached content")
+    def create_cached_file(self, *path_elements):
+        self._create_file_with_content(self._join(self.configuration.cached_packages_directory, *path_elements), "cached content")
 
-    def touch_hosted_file(self, *path_elements):
-        self._touch_file(self._join(self.configuration.hosted_packages_directory, *path_elements), "hosted content")
+    def create_hosted_file(self, *path_elements):
+        self._create_file_with_content(self._join(self.configuration.hosted_packages_directory, *path_elements), "hosted content")
 
     def is_server_reachable(self):
         try:
@@ -58,7 +58,7 @@ class LiveServer():
     def stop_server_process(self):
         self._process.terminate()
 
-    def _touch_file(self, file_name, content):
+    def _create_file_with_content(self, file_name, content):
         f = open(file_name, "w")
         try:
             f.write(content)

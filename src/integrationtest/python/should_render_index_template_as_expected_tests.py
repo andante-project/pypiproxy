@@ -8,7 +8,7 @@ from staticpypi import StaticPyPiServer
 def integration_test():
     with StaticPyPiServer():
         with LiveServer() as liveserver:
-            liveserver.touch_hosted_file("yadt-1.2.3.tar.gz")
+            liveserver.create_hosted_file("yadt-1.2.3.tar.gz")
 
             index_page = download(liveserver.url + "simple/")
 

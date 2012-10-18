@@ -16,7 +16,7 @@ def integration_test():
 def integration_test_with_hosted_file():
     with StaticPyPiServer():
         with LiveServer() as liveserver:
-            liveserver.touch_hosted_file("pyassert-0.1.2.tar.gz")
+            liveserver.create_hosted_file("pyassert-0.1.2.tar.gz")
 
             index_page = download(liveserver.url + "simple/")
 
@@ -26,7 +26,7 @@ def integration_test_with_hosted_file():
 def integration_test_with_cached_file():
     with StaticPyPiServer():
         with LiveServer() as liveserver:
-            liveserver.touch_cached_file("pyassert-0.1.2.tar.gz")
+            liveserver.create_cached_file("pyassert-0.1.2.tar.gz")
 
             index_page = download(liveserver.url + "simple/")
 
@@ -37,8 +37,8 @@ def integration_test_with_cached_file():
 def integration_test_with_hosted_and_cached_file():
     with StaticPyPiServer():
         with LiveServer() as liveserver:
-            liveserver.touch_cached_file("schnulli-0.1.2.tar.gz")
-            liveserver.touch_hosted_file("committer-0.0.60.tar.gz")
+            liveserver.create_cached_file("schnulli-0.1.2.tar.gz")
+            liveserver.create_hosted_file("committer-0.0.60.tar.gz")
 
             index_page = download(liveserver.url + "simple/")
 

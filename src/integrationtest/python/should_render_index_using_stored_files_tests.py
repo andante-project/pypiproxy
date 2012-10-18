@@ -7,7 +7,7 @@ from staticpypi import StaticPyPiServer
 @test
 def integration_test_with_hosted_file():
     with LiveServer() as liveserver:
-        liveserver.touch_hosted_file("pyassert-0.1.2.tar.gz")
+        liveserver.create_hosted_file("pyassert-0.1.2.tar.gz")
 
         index_page = download(liveserver.url + "simple/")
 
@@ -16,8 +16,8 @@ def integration_test_with_hosted_file():
 @test
 def integration_test_with_cached_file():
     with LiveServer() as liveserver:
-        liveserver.touch_cached_file("pyassert-0.1.2.tar.gz")
-        liveserver.touch_cached_file("yadt-2.0.0.tar.gz")
+        liveserver.create_cached_file("pyassert-0.1.2.tar.gz")
+        liveserver.create_cached_file("yadt-2.0.0.tar.gz")
 
         index_page = download(liveserver.url + "simple/")
 
@@ -26,9 +26,9 @@ def integration_test_with_cached_file():
 @test
 def integration_test_with_hosted_and_cached_file():
     with LiveServer() as liveserver:
-        liveserver.touch_cached_file("pyfix-0.1.2.tar.gz")
-        liveserver.touch_cached_file("pyassert-0.1.2.tar.gz")
-        liveserver.touch_hosted_file("committer-0.0.60.tar.gz")
+        liveserver.create_cached_file("pyfix-0.1.2.tar.gz")
+        liveserver.create_cached_file("pyassert-0.1.2.tar.gz")
+        liveserver.create_hosted_file("committer-0.0.60.tar.gz")
 
         index_page = download(liveserver.url + "simple/")
 

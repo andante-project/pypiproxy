@@ -6,9 +6,9 @@ from pyfix import test, run_tests
 @test
 def integration_test():
     with LiveServer() as liveserver:
-        liveserver.touch_hosted_file("pyassert-0.1.2.tar.gz")
-        liveserver.touch_hosted_file("pyassert-1.2.3.tar.gz")
-        liveserver.touch_hosted_file("pyassert-2.3.4.tar.gz")
+        liveserver.create_hosted_file("pyassert-0.1.2.tar.gz")
+        liveserver.create_hosted_file("pyassert-1.2.3.tar.gz")
+        liveserver.create_hosted_file("pyassert-2.3.4.tar.gz")
 
         index_page = download(liveserver.url + "simple/pyassert/")
 
