@@ -10,7 +10,7 @@ This PyPI implementation has been created with *continuous delivery* in mind.
 python setup.py sdist upload -r http://pypiproxy.domain:1234/
 ```
 
-## Installing a .tar.gz using pip
+## Installing a .tar.gz using pip 
 
 ```bash
 pip install flask --index http://pypiproxy.domain:1234/simple
