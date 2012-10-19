@@ -38,6 +38,7 @@ def ensure_proxy_checks_if_package_is_already_cached (temp_dir):
 
     verify(proxy_package_index._package_index).contains("pyassert", "0.2.5")
 
+
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
 @after(unstub)
@@ -143,7 +144,7 @@ def ensure_list_versions_delegates_to_cached_versions_when_to_download_versions_
 @test
 @given(temp_dir=TemporaryDirectoryFixture)
 @after(unstub)
-def ensure_list_versions_retrieves_versions_from_pypi (temp_dir):
+def ensure_list_versions_retrieves_versions_from_pypi_with_md5_hash_in_href (temp_dir):
     proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")
     package_stream = StringIO("""<!doctype html><html><body>
 <a href='package-0.1.2.tar.gz#md5=foobar'>package-0.1.2.tar.gz</a><br/>

@@ -27,6 +27,9 @@ LOGGER = logging.getLogger("pypiproxy.packageindex")
 _PACKAGE_NAME_AND_VERSION_PATTERN = re.compile(r"^(.*?)(-([0-9.]+.*)).tar.gz$")
 _HREF_PATTERN = re.compile(r'href=[\'"]?([^\'" >]+)')
 
+FILE_SUFFIX = ".tar.gz"
+
+
 def _guess_name_and_version(filename):
     result = _PACKAGE_NAME_AND_VERSION_PATTERN.match(filename)
     if result:
@@ -42,7 +45,6 @@ def _guess_name_and_version(filename):
 
 
 class PackageIndex(object):
-    FILE_SUFFIX = ".tar.gz"
 
     def __init__(self, name, directory):
         self._name = name
@@ -73,7 +75,7 @@ class PackageIndex(object):
         return len([p for p in self._read_packages()])
 
     def get_package_content(self, package, version):
-        filename = os.path.join(self._directory, package + "-" + version + PackageIndex.FILE_SUFFIX)
+        filename = os.path.join(self._directory, package + "-" + version + FILE_SUFFIX)
         if not self.contains(package, version):
             return None
 
@@ -92,10 +94,10 @@ class PackageIndex(object):
             itertools.ifilter(lambda name_and_version: name_and_version[0] == name, self._read_packages()))
 
     def _filename_from_name_and_version(self, name, version):
-        return os.path.join(self._directory, "{0}-{1}{2}".format(name, version, PackageIndex.FILE_SUFFIX))
+        return os.path.join(self._directory, "{0}-{1}{2}".format(name, version, FILE_SUFFIX))
 
     def _read_files(self):
-        return itertools.ifilter(lambda f: f.endswith(PackageIndex.FILE_SUFFIX), os.listdir(self._directory))
+        return itertools.ifilter(lambda f: f.endswith(FILE_SUFFIX), os.listdir(self._directory))
 
     def _read_packages(self):
         return itertools.imap(_guess_name_and_version, self._read_files())
@@ -111,7 +113,7 @@ class ProxyPackageIndex(object):
 
     def get_package_content(self, name, version):
         if not self._package_index.contains(name, version):
-            filename = "{0}-{1}{2}".format(name, version, PackageIndex.FILE_SUFFIX)
+            filename = "{0}-{1}{2}".format(name, version, FILE_SUFFIX)
             package_url = "{0}/packages/source/{1}/{2}/{3}".format(self._pypi_url, name[0], name, filename)
             LOGGER.info("Downloading package {0} in version {1} from {2}".format(name, version, package_url))
             content = self._fetch_url(package_url, raw=True)
@@ -153,21 +155,15 @@ class ProxyPackageIndex(object):
 
     def _extract_versions(self, versions_content):
         result = []
-        for line in versions_content.split("\n"):
-            line = line.decode("utf8")
-            if line.startswith('<a href') and line.find(PackageIndex.FILE_SUFFIX) >= 0:
-                name = self._href_from(line)
+        hrefs = _HREF_PATTERN.findall(versions_content)
+        for href in hrefs :
+            if FILE_SUFFIX in href:
+                name = href.decode("utf8")
                 if "#md5" in name:
                     name = name[0:name.rfind('#md5')]
                 version = _guess_name_and_version(name)[1]
                 result.append(version)
         return result
-
-    def _href_from(self, text):
-        hrefs = _HREF_PATTERN.findall(text)
-        if len(hrefs) is not 1:
-            raise ValueError("Invalid link contains multiple href values")
-        return hrefs[0]
 
     def _fetch_url(self, url, raw=False):
         stream = None

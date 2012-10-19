@@ -36,7 +36,7 @@ use_plugin("python.install_dependencies")
 default_task = ["analyze", "publish"]
 
 name = "pypiproxy"
-version = "0.3.0"
+version = "0.3.1"
 summary = "A proxy server for the python package index."
 authors = (Author("Alexander Metzner", "halimath.wilanthaou@gmail.com"),
 		   Author("Michael Gruber", "aelgru@gmail.com"),
