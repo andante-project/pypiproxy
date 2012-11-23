@@ -8,8 +8,7 @@ def handle_yadt_download():
 
 @application.route("/simple/yadt/")
 def handle_yadt_versions():
-    return """<!doctype html><html><head></head><body>
-<a href="yadt-0.1.2.tar.gz">yadt-0.1.2</a><br/>
+    return """<!doctype html><html><head></head><body><a href="yadt-0.1.2.tar.gz">yadt-0.1.2</a><br/>
 <a href="yadt-1.2.3.tar.gz">yadt-1.2.3</a><br/>
 <a href="yadt-2.3.4.tar.gz">yadt-2.3.4</a><br/>
 </body></html>"""

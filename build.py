@@ -36,7 +36,7 @@ use_plugin("python.install_dependencies")
 default_task = ["analyze", "publish"]
 
 name = "pypiproxy"
-version = "0.3.0"
+version = "0.3.1"
 summary = "A proxy server for the python package index."
 authors = (Author("Alexander Metzner", "halimath.wilanthaou@gmail.com"),
 		   Author("Michael Gruber", "aelgru@gmail.com"),
@@ -75,3 +75,4 @@ def set_properties_for_teamcity_builds (project):
     import os
     project.version = '%s-%s' % (project.version, os.environ.get('BUILD_NUMBER', 0))
     project.default_task = ['install_dependencies', 'publish']
+    project.set_property('install_dependencies_use_mirrors', False)
