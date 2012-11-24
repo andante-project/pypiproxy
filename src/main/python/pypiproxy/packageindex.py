@@ -136,9 +136,9 @@ class ProxyPackageIndex(object):
         versions_url = "{0}/simple/{1}/".format(self._pypi_url, name)
         LOGGER.info("Downloading versions from {0}".format(versions_url))
         versions_content = self._fetch_url(versions_url)
-        LOGGER.info("Downloaded versions page for {0} from {1} is {2} bytes.".format(name, versions_url, len(versions_content)))
 
         if versions_content is not None:
+            LOGGER.info("Downloaded versions page for {0} from {1} is {2} bytes.".format(name, versions_url, len(versions_content)))
             return self._extract_versions(versions_content)
         else:
             return sorted(list(self._package_index.list_versions(name)))
