@@ -1,5 +1,5 @@
 #   pypiproxy
-#   Copyright 2012 Michael Gruber, Alexander Metzner, Maximilien Riehl
+#   Copyright 2012-2013 Michael Gruber, Alexander Metzner, Maximilien Riehl
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 __author__ = 'Michael Gruber, Alexander Metzner, Maximilien Riehl'
 
-from pythonbuilder.core import init, use_plugin, Author
+from pybuilder.core import init, use_plugin, Author
 
 use_plugin("filter_resources")
 
