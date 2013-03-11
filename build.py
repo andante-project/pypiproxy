@@ -14,7 +14,7 @@
 #   limitations under the License.
 
 """
-	A proxy server for the python package index.
+    A proxy server for the python package index.
 """
 
 __author__ = 'Michael Gruber, Alexander Metzner, Maximilien Riehl'
@@ -80,6 +80,6 @@ def set_properties_for_teamcity_builds(project):
     import os
 
     project.version = '%s-%s' % (project.version, os.environ.get('BUILD_NUMBER', 0))
-    project.default_task = ['install_dependencies', 'publish']
+    project.default_task = ['install_build_dependencies', 'package']
     project.set_property('install_dependencies_use_mirrors', False)
     project.get_property('distutils_commands').append('bdist_rpm')
