@@ -11,8 +11,8 @@ def upload():
     return UploadBuilder()
 
 
-class UploadBuilder:
-    def __init__ (self):
+class UploadBuilder(object):
+    def __init__(self):
         self._file_content = "file content"
         self._file_name = "filename.txt"
         self._package_name = "package_name"
@@ -36,11 +36,11 @@ class UploadBuilder:
 
     def to(self, server):
         multi_part_request = MultiPartRequestBuilder() \
-                                .form_field(":action", "file_upload") \
-                                .form_field("name", self._package_name) \
-                                .form_field("version", self._package_version) \
-                                .file(self._file_name, self._file_content) \
-                            .build()
+            .form_field(":action", "file_upload") \
+            .form_field("name", self._package_name) \
+            .form_field("version", self._package_version) \
+            .file(self._file_name, self._file_content) \
+            .build()
 
         return send_post_request(server.host, server.port, "/", multi_part_request)
 

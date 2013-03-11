@@ -9,7 +9,8 @@ CONFIGURATION_FILE = "src/integrationtest/resources/pypiproxy_integrationtest.cf
 MAX_WAITING_SECONDS = 10
 TIMEOUT_SECONDS = 0.05
 
-class LiveServer():
+
+class LiveServer(object):
     def __init__(self):
         self.configuration = pypiproxy.configuration.Configuration(CONFIGURATION_FILE)
 
@@ -38,10 +39,12 @@ class LiveServer():
         self.stop_server_process()
 
     def create_cached_file(self, *path_elements):
-        self._create_file_with_content(self._join(self.configuration.cached_packages_directory, *path_elements), "cached content")
+        self._create_file_with_content(self._join(self.configuration.cached_packages_directory, *path_elements),
+                                       "cached content")
 
     def create_hosted_file(self, *path_elements):
-        self._create_file_with_content(self._join(self.configuration.hosted_packages_directory, *path_elements), "hosted content")
+        self._create_file_with_content(self._join(self.configuration.hosted_packages_directory, *path_elements),
+                                       "hosted content")
 
     def is_server_reachable(self):
         try:
