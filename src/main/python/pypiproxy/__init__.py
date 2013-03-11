@@ -23,9 +23,9 @@ from .configuration import Configuration
 from .services import initialize_services
 
 def initialize(config_file):
-    configuration = Configuration(config_file)
-    initialize_logging(configuration.log_file)
-    initialize_services(configuration.hosted_packages_directory, configuration.cached_packages_directory, configuration.pypi_url)
+    current_configuration = Configuration(config_file)
+    initialize_logging(current_configuration.log_file)
+    initialize_services(current_configuration.hosted_packages_directory, current_configuration.cached_packages_directory, current_configuration.pypi_url)
 
 
 def initialize_logging(log_file):
