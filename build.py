@@ -29,6 +29,7 @@ use_plugin("python.integrationtest")
 use_plugin("python.coverage")
 use_plugin("python.pydev")
 use_plugin("python.distutils")
+use_plugin('copy_resources')
 
 use_plugin("python.install_dependencies")
 
@@ -38,19 +39,23 @@ name = "pypiproxy"
 version = "0.3.1"
 summary = "A proxy server for the python package index."
 authors = (Author("Alexander Metzner", "halimath.wilanthaou@gmail.com"),
-		   Author("Michael Gruber", "aelgru@gmail.com"),
-		   Author("Maximilien Riehl", "maximilien.riehl@gmail.com"))
+           Author("Michael Gruber", "aelgru@gmail.com"),
+           Author("Maximilien Riehl", "maximilien.riehl@gmail.com"))
 url = "https://github.com/aelgru/pypiproxy"
 license = "Apache License, Version 2.0"
 
+
 @init
-def initialize (project):
+def initialize(project):
     project.build_depends_on("mockito")
     project.build_depends_on("pyassert")
 
     project.depends_on("flask")
 
     project.get_property("filter_resources_glob").append("**/pypiproxy/__init__.py")
+
+    project.get_property('copy_resources_glob').append('setup.cfg')
+
 
     project.include_file("pypiproxy", "templates/*.html")
 
@@ -68,10 +73,12 @@ def initialize (project):
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7'])
-        
+
+
 @init(environments='teamcity')
-def set_properties_for_teamcity_builds (project):
+def set_properties_for_teamcity_builds(project):
     import os
+
     project.version = '%s-%s' % (project.version, os.environ.get('BUILD_NUMBER', 0))
     project.default_task = ['install_dependencies', 'publish']
     project.set_property('install_dependencies_use_mirrors', False)
