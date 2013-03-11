@@ -5,5 +5,5 @@ import sys
 from pypiproxy.webapp import application
 from pypiproxy import initialize
 
-initialize("pypiproxy.cfg")
+initialize("/etc/pypiproxy.cfg")
 application.run(debug=True)
