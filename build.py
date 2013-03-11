@@ -53,27 +53,11 @@ def initialize(project):
     project.depends_on("flask")
 
     project.get_property("filter_resources_glob").append("**/pypiproxy/__init__.py")
-
     project.get_property('copy_resources_glob').append('setup.cfg')
-
-
     project.include_file("pypiproxy", "templates/*.html")
-
-    project.set_property("pychecker_break_build", False)
 
     project.set_property("coverage_threshold_warn", 85)
     project.set_property("coverage_break_build", False)
-
-    project.get_property("distutils_commands").append("bdist_egg")
-    project.set_property("distutils_classifiers", [
-        'Development Status :: 4 - Beta',
-        'Environment :: Other Environment',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7'])
-
 
 @init(environments='teamcity')
 def set_properties_for_teamcity_builds(project):
