@@ -2,8 +2,6 @@
 
 import sys
 
-sys.path.append("src/main/python")
-
 from pypiproxy.webapp import application
 from pypiproxy import initialize
 
