@@ -27,7 +27,6 @@ use_plugin("python.core")
 use_plugin("python.pyfix_unittest")
 use_plugin("python.integrationtest")
 use_plugin("python.coverage")
-#use_plugin("python.pychecker")
 use_plugin("python.pydev")
 use_plugin("python.distutils")
 
@@ -76,3 +75,4 @@ def set_properties_for_teamcity_builds (project):
     project.version = '%s-%s' % (project.version, os.environ.get('BUILD_NUMBER', 0))
     project.default_task = ['install_dependencies', 'publish']
     project.set_property('install_dependencies_use_mirrors', False)
+    project.get_property('distutils_commands').append('bdist_rpm')
