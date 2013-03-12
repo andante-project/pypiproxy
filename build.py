@@ -60,8 +60,6 @@ def initialize(project):
     project.set_property("coverage_threshold_warn", 85)
     project.set_property("coverage_break_build", False)
 
-    project.install_file('/etc/', 'pypiproxy/pypiproxy.cfg')
-
 @init(environments='teamcity')
 def set_properties_for_teamcity_builds(project):
     import os
