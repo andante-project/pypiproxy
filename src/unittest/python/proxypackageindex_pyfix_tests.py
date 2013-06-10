@@ -15,6 +15,7 @@
 
 __author__ = "Michael Gruber, Maximilien Riehl"
 
+import os
 from pyfix import after, test, given
 from pyfix.fixtures import TemporaryDirectoryFixture
 from pyassert import assert_that
@@ -81,6 +82,7 @@ def ensure_list_available_package_names_retrieves_index_from_pypi (temp_dir):
 <a href='beta'>beta</a><br/>
 <a href='gamma'>gamma</a><br/>
 </body></html>""")
+    os.environ={}
     when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenReturn(package_stream)
 
     actual_list = proxy_package_index.list_available_package_names()
@@ -95,6 +97,7 @@ def ensure_list_available_package_names_delegates_to_cached_index_when_failing_t
     proxy_package_index = ProxyPackageIndex("cached", temp_dir.join("packages"), "http://pypi.python.org")
     temp_dir.touch("packages", "spam-0.1.2.tar.gz")
     temp_dir.touch("packages", "eggs-0.1.2.tar.gz")
+    os.environ={}
     when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenRaise(URLError("Failed!"))
 
     actual_list = proxy_package_index.list_available_package_names()
@@ -115,6 +118,7 @@ def ensure_list_versions_retrieves_versions_from_pypi (temp_dir):
 <a href="package-3.01.tar.gz" rel="download">3.01 download_url</a><br/>
 <a href="package" rel="homepage">3.02 home_page</a><br/>
 </body></html>""")
+    os.environ={}
     when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenReturn(package_stream)
 
     actual_list = proxy_package_index.list_versions("package")
@@ -133,6 +137,7 @@ def ensure_list_versions_delegates_to_cached_versions_when_to_download_versions_
     temp_dir.touch("packages", "spam-1.2.3.tar.gz")
     temp_dir.touch("packages", "eggs-0.1.2.tar.gz")
     temp_dir.touch("packages", "eggs-0.1.2.egg")
+    os.environ={}
     when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenRaise(URLError("Failed!"))
 
     actual_list = proxy_package_index.list_versions("spam")
@@ -155,6 +160,7 @@ def ensure_list_versions_retrieves_versions_from_pypi_with_md5_hash_in_href (tem
 <a href="package-3.01.tar.gz#md5=foobar" rel="download">3.01 download_url</a><br/>
 <a href="package" rel="homepage">3.02 home_page</a><br/>
 </body></html>""")
+    os.environ={}
     when(pypiproxy.packageindex.urllib2).urlopen(any_value()).thenReturn(package_stream)
 
     actual_list = proxy_package_index.list_versions("package")
