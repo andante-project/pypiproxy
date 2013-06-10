@@ -105,7 +105,7 @@ class PackageIndex(object):
 
 class ProxyPackageIndex(object):
     """
-    Retrieves the packages from another pypi and stores them in a package index. 
+    Retrieves the packages from another pypi and stores them in a package index.
     """
     def __init__(self, name, directory, pypi_url):
         self._package_index = PackageIndex(name, directory)
@@ -169,7 +169,12 @@ class ProxyPackageIndex(object):
     def _fetch_url(self, url, raw=False):
         stream = None
         try:
-            stream = urllib2.urlopen(url)
+            if 'http_proxy' in os.environ:
+                proxy = urllib2.ProxyHandler({'http': os.environ['http_proxy']})
+                opener = urllib2.build_opener(proxy)
+                stream = opener.open(url)
+            else:
+                stream = urllib2.urlopen(url)
             raw_content = stream.read()
             if raw:
                 return raw_content
