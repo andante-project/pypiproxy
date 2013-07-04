@@ -169,8 +169,8 @@ class ProxyPackageIndex(object):
     def _fetch_url(self, url, raw=False):
         stream = None
         try:
-            if 'http_proxy' in os.environ:
-                proxy = urllib2.ProxyHandler({'http': os.environ['http_proxy']})
+            if 'http_proxy' in os.environ and 'https_proxy' in os.environ:
+                proxy = urllib2.ProxyHandler({'http': os.environ['http_proxy'], 'https': os.environ['https_proxy']})
                 opener = urllib2.build_opener(proxy)
                 stream = opener.open(url)
             else:
