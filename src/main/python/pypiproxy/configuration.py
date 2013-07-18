@@ -19,7 +19,7 @@ import ConfigParser
 
 class Configuration(object):
     DEFAULT_LOG_FILE = "/var/log/pypiproxy.log"
-    DEFAULT_PYPI_URL = "http://pypi.python.org"
+    DEFAULT_PYPI_URL = "https://pypi.python.org"
 
     OPTION_CACHED_PACKAGES_DIRECTORY = "cached_packages_directory"
     OPTION_HOSTED_PACKAGES_DIRECTORY = "hosted_packages_directory"
