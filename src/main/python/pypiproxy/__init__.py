@@ -18,18 +18,25 @@ __author__ = "Michael Gruber, Alexander Metzner"
 __version__ = "${version}"
 
 import logging
+import os
 
 from .configuration import Configuration
 from .services import initialize_services
 
+
 def initialize(config_file):
     current_configuration = Configuration(config_file)
     initialize_logging(current_configuration.log_file)
-    initialize_services(current_configuration.hosted_packages_directory, current_configuration.cached_packages_directory, current_configuration.pypi_url)
+    initialize_services(current_configuration.hosted_packages_directory,
+                        current_configuration.cached_packages_directory, current_configuration.pypi_url)
+    log_dir = os.path.dirname(current_configuration.log_file)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
 
 
 def initialize_logging(log_file):
-    formatter = logging.Formatter("%(asctime)s [%(name)s] %(levelname)s: %(message)s")
+    formatter = logging.Formatter(
+        "%(asctime)s [%(name)s] %(levelname)s: %(message)s")
 
     log_file_handler = logging.FileHandler(log_file)
     log_file_handler.setLevel(logging.DEBUG)
